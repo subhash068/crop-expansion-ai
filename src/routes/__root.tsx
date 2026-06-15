@@ -80,6 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "CropVision AI — AP Agriculture Intelligence" },
       { name: "description", content: "AI-powered crop mapping, diversification & suitability intelligence platform for the Andhra Pradesh Agriculture Department." },
       { name: "author", content: "AP Agriculture Department" },
+      { name: "keywords", content: "AI soil mapping, soil nutrient analytics, fertilizer advisory system, parcel-level soil health, precision agriculture Andhra Pradesh, satellite-based soil estimation" },
       { property: "og:title", content: "CropVision AI — AP Agriculture Intelligence" },
       { property: "og:description", content: "Parcel-level crop classification, diversification advisory, and GIS decision-support for Anantapur district." },
       { property: "og:type", content: "website" },

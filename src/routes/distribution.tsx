@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section } from "@/components/Kpi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroundTruth, cropCategory, groupBy, sum, uniq } from "@/lib/data";
 import { chartTooltip } from "./index";
 import { useMemo, useState } from "react";
@@ -51,14 +52,19 @@ function Distribution() {
         subtitle="Village, mandal and district-level crop area analysis"
         actions={
           <div className="flex gap-2">
-            <select value={mandal} onChange={(e) => setMandal(e.target.value)} className="h-9 px-3 rounded-lg bg-muted/50 border border-border text-sm">
-              <option value="All">All Mandals</option>
-              {mandals.map((m) => <option key={m} value={m}>{m}</option>)}
-            </select>
+            <Select value={mandal} onValueChange={(v) => setMandal(v)}>
+              <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm w-[150px]">
+                <SelectValue placeholder="All Mandals" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Mandals</SelectItem>
+                {mandals.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border">
               {["Kharif", "Rabi", "Summer"].map((s) => (
                 <button key={s} onClick={() => setSeason(s)}
-                  className={`px-3 py-1 text-xs rounded-md ${season === s ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}>
+                  className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${season === s ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}>
                   {s}
                 </button>
               ))}
@@ -80,7 +86,7 @@ function Distribution() {
           </ResponsiveContainer>
         </Section>
 
-        <Section title="Mandal Comparison — Strategic Crops" className="lg:col-span-2">
+        <Section title="Mandal Comparison — Millets, Pulses, Oilseeds" className="lg:col-span-2">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={mandalCompare}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />

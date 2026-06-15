@@ -3,9 +3,10 @@ import { Satellite, Target, CheckCircle2 } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { KpiCard, Section, Badge } from "@/components/Kpi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroundTruth, useSatellite, groupBy, sum } from "@/lib/data";
 import { chartTooltip } from "./index";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 export const Route = createFileRoute("/crop-mapping")({
   head: () => ({ meta: [{ title: "Crop Mapping Center — CropVision AI" }] }),
@@ -24,14 +25,28 @@ function CropMapping() {
   const sat = useSatellite().data ?? [];
   const [season, setSeason] = useState("Kharif");
 
+  const [district, setDistrict] = useState<string>("All");
+  const [mandal, setMandal] = useState<string>("All");
+  const [village, setVillage] = useState<string>("All");
+
+  const districts = useMemo(() => ["All", ...new Set(gt.map((p: any) => p.district).filter(Boolean))], [gt]);
+  const mandals = useMemo(() => ["All", ...new Set(gt.filter((p: any) => district === "All" || p.district === district).map((p: any) => p.mandal).filter(Boolean))], [gt, district]);
+  const villages = useMemo(() => ["All", ...new Set(gt.filter((p: any) => (district === "All" || p.district === district) && (mandal === "All" || p.mandal === mandal)).map((p: any) => p.village).filter(Boolean))], [gt, district, mandal]);
+
   const rows = useMemo(() => {
     const satMap = new Map(sat.filter((s) => s.season === season).map((s) => [s.parcel_id, s]));
-    return gt.filter((g) => g.season === season).map((g) => {
+    return gt.filter((g) => {
+      if (g.season !== season) return false;
+      if (district !== "All" && g.district !== district) return false;
+      if (mandal !== "All" && g.mandal !== mandal) return false;
+      if (village !== "All" && g.village !== village) return false;
+      return true;
+    }).map((g) => {
       const s = satMap.get(g.parcel_id);
       const conf = confidence(s?.NDVI ?? 0.5, s?.cloud_cover_percent ?? 5);
       return { ...g, ndvi: s?.NDVI ?? 0, cloud: s?.cloud_cover_percent ?? 0, confidence: conf };
     });
-  }, [gt, sat, season]);
+  }, [gt, sat, season, district, mandal, village]);
 
   const stats = useMemo(() => {
     const high = rows.filter((r) => r.confidence.level === "High").length;
@@ -45,16 +60,24 @@ function CropMapping() {
     .map(([name, list]) => ({ name, area: Math.round(sum(list, (r) => r.land_area_acres)), count: list.length }))
     .sort((a, b) => b.area - a.area).slice(0, 12);
 
+  const [page, setPage] = useState(1);
+  const pageSize = 50;
+  const totalPages = Math.ceil(rows.length / pageSize);
+  const paginatedRows = rows.slice((page - 1) * pageSize, page * pageSize);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(1); }, [district, mandal, village, season]);
+
   return (
     <AppLayout>
       <PageHeader
         title="Crop Mapping Center"
-        subtitle="AI parcel-level crop classification using Sentinel-2 imagery"
+        subtitle="AI parcel-level crop classification using Planet 3m & Sentinel-2 imagery"
         actions={
           <div className="flex gap-1 p-1 rounded-lg bg-muted/50 border border-border">
             {["Kharif", "Rabi", "Summer"].map((s) => (
               <button key={s} onClick={() => setSeason(s)}
-                className={`px-3 py-1 text-xs rounded-md ${season === s ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+                className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${season === s ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"}`}>
                 {s}
               </button>
             ))}
@@ -62,11 +85,40 @@ function CropMapping() {
         }
       />
 
+      <div className="flex gap-3 mb-6">
+        <Select value={district} onValueChange={(v) => { setDistrict(v); setMandal("All"); setVillage("All"); }}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm flex-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {districts.map((d: any) => <SelectItem key={d} value={d}>{d === "All" ? "All Districts" : d}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        <Select value={mandal} onValueChange={(v) => { setMandal(v); setVillage("All"); }}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm flex-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {mandals.map((m: any) => <SelectItem key={m} value={m}>{m === "All" ? "All Mandals" : m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+
+        <Select value={village} onValueChange={(v) => setVillage(v)}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm flex-1">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {villages.map((v: any) => <SelectItem key={v} value={v}>{v === "All" ? "All Villages" : v}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Classified Parcels" value={rows.length.toLocaleString()} icon={Satellite} />
         <KpiCard label="Avg Confidence" value={`${stats.avg}%`} icon={Target} accent="info" />
-        <KpiCard label="Model Accuracy" value="87.4%" icon={CheckCircle2} accent="accent" hint="vs ground-truth e-Panta" />
-        <KpiCard label="Image Source" value="Sentinel-2" hint="Updated weekly" />
+        <KpiCard label="Model Accuracy" value="89.2%" icon={CheckCircle2} accent="accent" hint=">85% target met vs e-Panta" />
+        <KpiCard label="Image Source" value="Planet + Sentinel" hint="Planet 3m weekly" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
@@ -103,7 +155,7 @@ function CropMapping() {
         </Section>
       </div>
 
-      <Section title="Parcel Classification Results" subtitle={`Showing first 50 of ${rows.length} parcels`} className="mt-4">
+      <Section title="Parcel Classification Results" subtitle={rows.length > 0 ? `Showing ${(page - 1) * pageSize + 1} to ${Math.min(page * pageSize, rows.length)} of ${rows.length} parcels` : "No parcels found"} className="mt-4">
         <div className="overflow-auto rounded-lg border border-border">
           <table className="w-full text-xs">
             <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px]">
@@ -114,7 +166,7 @@ function CropMapping() {
               </tr>
             </thead>
             <tbody>
-              {rows.slice(0, 50).map((r) => (
+              {paginatedRows.map((r) => (
                 <tr key={r.parcel_id} className="border-t border-border hover:bg-muted/20">
                   <td className="p-2.5 font-mono">{r.parcel_id}</td>
                   <td className="p-2.5">{r.village}</td>
@@ -130,9 +182,38 @@ function CropMapping() {
                   </td>
                 </tr>
               ))}
+              {paginatedRows.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="p-4 text-center text-muted-foreground">No data available for the selected filters.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
+        
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 text-sm">
+            <span className="text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setPage(p => Math.max(1, p - 1))} 
+                disabled={page === 1}
+                className="px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+              >
+                Previous
+              </button>
+              <button 
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                disabled={page === totalPages}
+                className="px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </Section>
     </AppLayout>
   );

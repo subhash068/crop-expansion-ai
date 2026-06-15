@@ -17,6 +17,7 @@ import { Route as SchemesRouteImport } from './routes/schemes'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ParcelsRouteImport } from './routes/parcels'
 import { Route as GisRouteImport } from './routes/gis'
+import { Route as ExpansionRouteImport } from './routes/expansion'
 import { Route as DiversificationRouteImport } from './routes/diversification'
 import { Route as DistributionRouteImport } from './routes/distribution'
 import { Route as CropMappingRouteImport } from './routes/crop-mapping'
@@ -64,6 +65,11 @@ const GisRoute = GisRouteImport.update({
   path: '/gis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExpansionRoute = ExpansionRouteImport.update({
+  id: '/expansion',
+  path: '/expansion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiversificationRoute = DiversificationRouteImport.update({
   id: '/diversification',
   path: '/diversification',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
+  '/expansion': typeof ExpansionRoute
   '/gis': typeof GisRoute
   '/parcels': typeof ParcelsRoute
   '/reports': typeof ReportsRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
+  '/expansion': typeof ExpansionRoute
   '/gis': typeof GisRoute
   '/parcels': typeof ParcelsRoute
   '/reports': typeof ReportsRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
+  '/expansion': typeof ExpansionRoute
   '/gis': typeof GisRoute
   '/parcels': typeof ParcelsRoute
   '/reports': typeof ReportsRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
+    | '/expansion'
     | '/gis'
     | '/parcels'
     | '/reports'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
+    | '/expansion'
     | '/gis'
     | '/parcels'
     | '/reports'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
+    | '/expansion'
     | '/gis'
     | '/parcels'
     | '/reports'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   CropMappingRoute: typeof CropMappingRoute
   DistributionRoute: typeof DistributionRoute
   DiversificationRoute: typeof DiversificationRoute
+  ExpansionRoute: typeof ExpansionRoute
   GisRoute: typeof GisRoute
   ParcelsRoute: typeof ParcelsRoute
   ReportsRoute: typeof ReportsRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/expansion': {
+      id: '/expansion'
+      path: '/expansion'
+      fullPath: '/expansion'
+      preLoaderRoute: typeof ExpansionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/diversification': {
       id: '/diversification'
       path: '/diversification'
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   CropMappingRoute: CropMappingRoute,
   DistributionRoute: DistributionRoute,
   DiversificationRoute: DiversificationRoute,
+  ExpansionRoute: ExpansionRoute,
   GisRoute: GisRoute,
   ParcelsRoute: ParcelsRoute,
   ReportsRoute: ReportsRoute,
@@ -334,3 +355,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

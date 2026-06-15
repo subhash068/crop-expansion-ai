@@ -75,7 +75,8 @@ export type RotationRow = {
 };
 
 async function loadCsv<T>(file: string): Promise<T[]> {
-  const res = await fetch(`/data/${file}`);
+  const cacheBuster = new Date().getTime();
+  const res = await fetch(`/data/${file}?v=${cacheBuster}`);
   const text = await res.text();
   const parsed = Papa.parse<T>(text, { header: true, dynamicTyping: true, skipEmptyLines: true });
   return parsed.data as T[];

@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Search, MapPin, Wheat, Droplets, Activity, TrendingUp } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section, KpiCard, Badge } from "@/components/Kpi";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroundTruth, useSatellite, useSoil, useWeather, useYield } from "@/lib/data";
 
 export const Route = createFileRoute("/parcels")({
@@ -17,25 +18,43 @@ function Parcels() {
   const weather = useWeather().data ?? [];
   const yields = useYield().data ?? [];
   const [q, setQ] = useState("");
+  const [filterMandal, setFilterMandal] = useState("All");
+  const [filterCrop, setFilterCrop] = useState("All");
   const [selected, setSelected] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 40;
 
   const parcels = useMemo(() => {
     const ids = Array.from(new Set(gt.map((g) => g.parcel_id)));
     return ids.map((id) => gt.find((g) => g.parcel_id === id)!);
   }, [gt]);
 
-  const filtered = useMemo(() => {
-    if (!q) return parcels.slice(0, 40);
-    const ql = q.toLowerCase();
-    return parcels.filter((p) =>
-      p.parcel_id.toLowerCase().includes(ql) ||
-      p.village.toLowerCase().includes(ql) ||
-      p.mandal.toLowerCase().includes(ql) ||
-      p.survey_no.toLowerCase().includes(ql)
-    ).slice(0, 40);
-  }, [parcels, q]);
+  const mandals = useMemo(() => Array.from(new Set(parcels.map(p => p.mandal))).sort(), [parcels]);
+  const crops = useMemo(() => Array.from(new Set(parcels.map(p => p.crop_type))).sort(), [parcels]);
 
-  const sel = selected ?? filtered[0]?.parcel_id;
+  const filtered = useMemo(() => {
+    let result = parcels;
+    if (filterMandal !== "All") result = result.filter(p => p.mandal === filterMandal);
+    if (filterCrop !== "All") result = result.filter(p => p.crop_type === filterCrop);
+    
+    if (q) {
+      const ql = q.toLowerCase();
+      result = result.filter((p) =>
+        p.parcel_id.toLowerCase().includes(ql) ||
+        p.village.toLowerCase().includes(ql) ||
+        p.mandal.toLowerCase().includes(ql) ||
+        p.survey_no.toLowerCase().includes(ql)
+      );
+    }
+    return result;
+  }, [parcels, q, filterMandal, filterCrop]);
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const paginated = useMemo(() => filtered.slice((page - 1) * pageSize, page * pageSize), [filtered, page]);
+
+  useEffect(() => { setPage(1); }, [q, filterMandal, filterCrop]);
+
+  const sel = selected ?? paginated[0]?.parcel_id;
   const detail = useMemo(() => {
     if (!sel) return null;
     const all = gt.filter((g) => g.parcel_id === sel);
@@ -53,14 +72,37 @@ function Parcels() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Section title="Search Parcels" className="lg:col-span-1">
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <input value={q} onChange={(e) => setQ(e.target.value)}
-              placeholder="Parcel ID, village, mandal, survey no."
-              className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted/50 border border-border text-sm outline-none focus:ring-2 focus:ring-ring/50" />
+          <div className="relative mb-3 flex flex-col gap-2">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <input value={q} onChange={(e) => setQ(e.target.value)}
+                placeholder="Parcel ID, village, mandal, survey no."
+                className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted/50 border border-border text-sm outline-none focus:ring-2 focus:ring-ring/50" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <Select value={filterMandal} onValueChange={setFilterMandal}>
+                <SelectTrigger className="h-8 text-xs bg-muted/50 border-border">
+                  <SelectValue placeholder="All Mandals" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Mandals</SelectItem>
+                  {mandals.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              
+              <Select value={filterCrop} onValueChange={setFilterCrop}>
+                <SelectTrigger className="h-8 text-xs bg-muted/50 border-border">
+                  <SelectValue placeholder="All Crops" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Crops</SelectItem>
+                  {crops.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="space-y-1 max-h-[520px] overflow-auto -mx-2 px-2">
-            {filtered.map((p) => (
+            {paginated.map((p) => (
               <button key={p.parcel_id} onClick={() => setSelected(p.parcel_id)}
                 className={`w-full text-left p-2.5 rounded-lg border transition-colors ${sel === p.parcel_id ? "bg-primary/10 border-primary/50" : "border-transparent hover:bg-muted/40"}`}>
                 <div className="flex items-center justify-between">
@@ -71,6 +113,30 @@ function Parcels() {
               </button>
             ))}
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex justify-between items-center pt-3 mt-1 border-t border-border">
+              <span className="text-xs text-muted-foreground">
+                Pg {page}/{totalPages}
+              </span>
+              <div className="flex gap-1">
+                <button 
+                  onClick={() => setPage(p => Math.max(1, p - 1))} 
+                  disabled={page === 1}
+                  className="px-2 py-1 text-xs rounded border border-border hover:bg-muted disabled:opacity-50 transition-colors"
+                >
+                  Prev
+                </button>
+                <button 
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                  disabled={page === totalPages}
+                  className="px-2 py-1 text-xs rounded border border-border hover:bg-muted disabled:opacity-50 transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </Section>
 
         <div className="lg:col-span-2 space-y-4">
@@ -108,10 +174,15 @@ function Parcels() {
                   <div className="space-y-2 text-sm">
                     <Field label="pH" value={detail.soil?.pH?.toFixed(2) ?? "—"} />
                     <Field label="Organic Carbon" value={`${detail.soil?.organic_carbon?.toFixed(2) ?? "—"} %`} />
-                    <Field label="Fertility Score" value={`${detail.soil?.soil_fertility_score ?? "—"}/100`} />
+                    <Field label="Fertility Score" value={`${detail.soil?.soil_fertility_score || Math.min(100, Math.round(50 + (detail.soil?.organic_carbon || 0.5) * 30))}/100`} />
                     <Field label="Rainfall (Kharif)" value={`${detail.weather?.total_rainfall_mm?.toFixed(0) ?? "—"} mm`} />
                     <Field label="Avg Temp" value={`${detail.weather?.avg_temperature_c?.toFixed(1) ?? "—"} °C`} />
-                    <Field label="Drought Risk" value={<Badge variant={detail.weather?.drought_risk === "Low" ? "success" : detail.weather?.drought_risk === "Medium" ? "warning" : "danger"}>{detail.weather?.drought_risk}</Badge>} />
+                    {(() => {
+                      const risk = detail.weather?.drought_risk || ((detail.weather?.total_rainfall_mm ?? 500) < 450 ? "High" : (detail.weather?.total_rainfall_mm ?? 500) < 650 ? "Medium" : "Low");
+                      return (
+                        <Field label="Drought Risk" value={<Badge variant={risk === "Low" ? "success" : risk === "Medium" ? "warning" : "danger"}>{risk}</Badge>} />
+                      );
+                    })()}
                   </div>
                 </Section>
               </div>

@@ -3,22 +3,23 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard, Satellite, MapPin, BarChart3, Sprout, Map,
   CloudRain, Mountain, BadgeCheck, MessageSquare, Globe2,
-  Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search,
+  Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search, Target
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
 const nav = [
   { to: "/", label: "Executive Dashboard", icon: LayoutDashboard },
+  { to: "/gis", label: "GIS Map Center", icon: Globe2 },
   { to: "/crop-mapping", label: "Crop Mapping Center", icon: Satellite },
   { to: "/parcels", label: "Parcel Intelligence", icon: MapPin },
   { to: "/distribution", label: "Crop Distribution", icon: BarChart3 },
   { to: "/diversification", label: "Diversification Engine", icon: Sprout },
+  { to: "/expansion", label: "Expansion Engine", icon: Target },
   { to: "/suitability", label: "Suitability Mapping", icon: Map },
   { to: "/weather", label: "Weather Intelligence", icon: CloudRain },
   { to: "/soil", label: "Soil Intelligence", icon: Mountain },
   { to: "/schemes", label: "Scheme Monitoring", icon: BadgeCheck },
   { to: "/advisory", label: "Advisory Center", icon: MessageSquare },
-  { to: "/gis", label: "GIS Map Center", icon: Globe2 },
   { to: "/copilot", label: "AI Copilot", icon: Bot },
   { to: "/reports", label: "Reports", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
