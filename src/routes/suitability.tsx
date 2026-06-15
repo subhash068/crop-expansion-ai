@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section, KpiCard, Badge } from "@/components/Kpi";
 import { useGroundTruth, useSuitability, cropCategory } from "@/lib/data";
-import { Map, Award, Layers } from "lucide-react";
+import { Map as MapIcon, Award, Layers } from "lucide-react";
 
 export const Route = createFileRoute("/suitability")({
   head: () => ({ meta: [{ title: "Suitability Mapping — CropVision AI" }] }),

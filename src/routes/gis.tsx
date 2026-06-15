@@ -98,8 +98,8 @@ function MapView({ parcels, gt, suit, layer }: any) {
     const layerGroup = L.layerGroup().addTo(map);
 
     const gtKharif = gt.filter((g: any) => g.season === "Kharif");
-    const gMap = new Map(gtKharif.map((g: any) => [g.parcel_id, g]));
-    const suitMap = new Map(suit.filter((s: any) => s.season === "Kharif").map((s: any) => [s.parcel_id, s]));
+    const gMap = new Map<string, any>(gtKharif.map((g: any) => [g.parcel_id, g]));
+    const suitMap = new Map<string, any>(suit.filter((s: any) => s.season === "Kharif").map((s: any) => [s.parcel_id, s]));
 
     parcels.forEach((p: any) => {
       let color = "#888";

@@ -9,8 +9,86 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WeatherRouteImport } from './routes/weather'
+import { Route as SuitabilityRouteImport } from './routes/suitability'
+import { Route as SoilRouteImport } from './routes/soil'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SchemesRouteImport } from './routes/schemes'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ParcelsRouteImport } from './routes/parcels'
+import { Route as GisRouteImport } from './routes/gis'
+import { Route as DiversificationRouteImport } from './routes/diversification'
+import { Route as DistributionRouteImport } from './routes/distribution'
+import { Route as CropMappingRouteImport } from './routes/crop-mapping'
+import { Route as CopilotRouteImport } from './routes/copilot'
+import { Route as AdvisoryRouteImport } from './routes/advisory'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuitabilityRoute = SuitabilityRouteImport.update({
+  id: '/suitability',
+  path: '/suitability',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SoilRoute = SoilRouteImport.update({
+  id: '/soil',
+  path: '/soil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchemesRoute = SchemesRouteImport.update({
+  id: '/schemes',
+  path: '/schemes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParcelsRoute = ParcelsRouteImport.update({
+  id: '/parcels',
+  path: '/parcels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GisRoute = GisRouteImport.update({
+  id: '/gis',
+  path: '/gis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiversificationRoute = DiversificationRouteImport.update({
+  id: '/diversification',
+  path: '/diversification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DistributionRoute = DistributionRouteImport.update({
+  id: '/distribution',
+  path: '/distribution',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CropMappingRoute = CropMappingRouteImport.update({
+  id: '/crop-mapping',
+  path: '/crop-mapping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CopilotRoute = CopilotRouteImport.update({
+  id: '/copilot',
+  path: '/copilot',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdvisoryRoute = AdvisoryRouteImport.update({
+  id: '/advisory',
+  path: '/advisory',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +97,214 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/advisory': typeof AdvisoryRoute
+  '/copilot': typeof CopilotRoute
+  '/crop-mapping': typeof CropMappingRoute
+  '/distribution': typeof DistributionRoute
+  '/diversification': typeof DiversificationRoute
+  '/gis': typeof GisRoute
+  '/parcels': typeof ParcelsRoute
+  '/reports': typeof ReportsRoute
+  '/schemes': typeof SchemesRoute
+  '/settings': typeof SettingsRoute
+  '/soil': typeof SoilRoute
+  '/suitability': typeof SuitabilityRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/advisory': typeof AdvisoryRoute
+  '/copilot': typeof CopilotRoute
+  '/crop-mapping': typeof CropMappingRoute
+  '/distribution': typeof DistributionRoute
+  '/diversification': typeof DiversificationRoute
+  '/gis': typeof GisRoute
+  '/parcels': typeof ParcelsRoute
+  '/reports': typeof ReportsRoute
+  '/schemes': typeof SchemesRoute
+  '/settings': typeof SettingsRoute
+  '/soil': typeof SoilRoute
+  '/suitability': typeof SuitabilityRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/advisory': typeof AdvisoryRoute
+  '/copilot': typeof CopilotRoute
+  '/crop-mapping': typeof CropMappingRoute
+  '/distribution': typeof DistributionRoute
+  '/diversification': typeof DiversificationRoute
+  '/gis': typeof GisRoute
+  '/parcels': typeof ParcelsRoute
+  '/reports': typeof ReportsRoute
+  '/schemes': typeof SchemesRoute
+  '/settings': typeof SettingsRoute
+  '/soil': typeof SoilRoute
+  '/suitability': typeof SuitabilityRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/advisory'
+    | '/copilot'
+    | '/crop-mapping'
+    | '/distribution'
+    | '/diversification'
+    | '/gis'
+    | '/parcels'
+    | '/reports'
+    | '/schemes'
+    | '/settings'
+    | '/soil'
+    | '/suitability'
+    | '/weather'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/advisory'
+    | '/copilot'
+    | '/crop-mapping'
+    | '/distribution'
+    | '/diversification'
+    | '/gis'
+    | '/parcels'
+    | '/reports'
+    | '/schemes'
+    | '/settings'
+    | '/soil'
+    | '/suitability'
+    | '/weather'
+  id:
+    | '__root__'
+    | '/'
+    | '/advisory'
+    | '/copilot'
+    | '/crop-mapping'
+    | '/distribution'
+    | '/diversification'
+    | '/gis'
+    | '/parcels'
+    | '/reports'
+    | '/schemes'
+    | '/settings'
+    | '/soil'
+    | '/suitability'
+    | '/weather'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdvisoryRoute: typeof AdvisoryRoute
+  CopilotRoute: typeof CopilotRoute
+  CropMappingRoute: typeof CropMappingRoute
+  DistributionRoute: typeof DistributionRoute
+  DiversificationRoute: typeof DiversificationRoute
+  GisRoute: typeof GisRoute
+  ParcelsRoute: typeof ParcelsRoute
+  ReportsRoute: typeof ReportsRoute
+  SchemesRoute: typeof SchemesRoute
+  SettingsRoute: typeof SettingsRoute
+  SoilRoute: typeof SoilRoute
+  SuitabilityRoute: typeof SuitabilityRoute
+  WeatherRoute: typeof WeatherRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suitability': {
+      id: '/suitability'
+      path: '/suitability'
+      fullPath: '/suitability'
+      preLoaderRoute: typeof SuitabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/soil': {
+      id: '/soil'
+      path: '/soil'
+      fullPath: '/soil'
+      preLoaderRoute: typeof SoilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schemes': {
+      id: '/schemes'
+      path: '/schemes'
+      fullPath: '/schemes'
+      preLoaderRoute: typeof SchemesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parcels': {
+      id: '/parcels'
+      path: '/parcels'
+      fullPath: '/parcels'
+      preLoaderRoute: typeof ParcelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gis': {
+      id: '/gis'
+      path: '/gis'
+      fullPath: '/gis'
+      preLoaderRoute: typeof GisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diversification': {
+      id: '/diversification'
+      path: '/diversification'
+      fullPath: '/diversification'
+      preLoaderRoute: typeof DiversificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/distribution': {
+      id: '/distribution'
+      path: '/distribution'
+      fullPath: '/distribution'
+      preLoaderRoute: typeof DistributionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crop-mapping': {
+      id: '/crop-mapping'
+      path: '/crop-mapping'
+      fullPath: '/crop-mapping'
+      preLoaderRoute: typeof CropMappingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/copilot': {
+      id: '/copilot'
+      path: '/copilot'
+      fullPath: '/copilot'
+      preLoaderRoute: typeof CopilotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/advisory': {
+      id: '/advisory'
+      path: '/advisory'
+      fullPath: '/advisory'
+      preLoaderRoute: typeof AdvisoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +317,19 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdvisoryRoute: AdvisoryRoute,
+  CopilotRoute: CopilotRoute,
+  CropMappingRoute: CropMappingRoute,
+  DistributionRoute: DistributionRoute,
+  DiversificationRoute: DiversificationRoute,
+  GisRoute: GisRoute,
+  ParcelsRoute: ParcelsRoute,
+  ReportsRoute: ReportsRoute,
+  SchemesRoute: SchemesRoute,
+  SettingsRoute: SettingsRoute,
+  SoilRoute: SoilRoute,
+  SuitabilityRoute: SuitabilityRoute,
+  WeatherRoute: WeatherRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
