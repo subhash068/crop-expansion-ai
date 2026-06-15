@@ -66,8 +66,8 @@ function Suitability() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Highly Suitable" value={counts.high} icon={Award} />
         <KpiCard label="Suitable" value={counts.suit} icon={Layers} accent="info" />
-        <KpiCard label="Moderately Suitable" value={counts.mod} icon={Map} accent="warning" />
-        <KpiCard label="Unsuitable" value={counts.un} icon={Map} />
+        <KpiCard label="Moderately Suitable" value={counts.mod} icon={MapIcon} accent="warning" />
+        <KpiCard label="Unsuitable" value={counts.un} icon={MapIcon} />
       </div>
 
       <Section title={`${target} Suitability Heatmap`} subtitle="Each tile = one parcel, color = suitability score" className="mt-6">
