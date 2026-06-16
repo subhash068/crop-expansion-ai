@@ -3,9 +3,10 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard, Satellite, MapPin, BarChart3, Sprout, Map,
   CloudRain, Mountain, BadgeCheck, MessageSquare, Globe2,
-  Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search, Target
+  Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search, Target, Menu
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 
 const nav = [
   { to: "/", label: "Executive Dashboard", icon: LayoutDashboard },
@@ -28,6 +29,7 @@ const nav = [
 export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [dark, setDark] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", !dark);
@@ -81,6 +83,53 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 border-b border-border bg-background/60 backdrop-blur-xl sticky top-0 z-30 flex items-center px-4 md:px-6 gap-3">
           <div className="md:hidden flex items-center gap-2">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <button className="p-1 -ml-1 mr-1">
+                  <Menu className="size-5" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-64 p-0 bg-sidebar border-r-sidebar-border flex flex-col h-full">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <SheetDescription className="sr-only">Access different sections of the application.</SheetDescription>
+                <div className="px-5 py-5 border-b border-sidebar-border flex items-center gap-2.5">
+                  <div className="size-9 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
+                    <Leaf className="size-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold leading-tight">CropVision AI</div>
+                    <div className="text-[10px] text-muted-foreground tracking-wide uppercase">AP Agri Dept</div>
+                  </div>
+                </div>
+                <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
+                  {nav.map((item) => {
+                    const active = pathname === item.to;
+                    const Icon = item.icon;
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`group relative flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-all ${
+                          active
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                            : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                        }`}
+                      >
+                        {active && (
+                          <motion.span
+                            layoutId="mobile-nav-pill"
+                            className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-primary"
+                          />
+                        )}
+                        <Icon className="size-4 shrink-0" />
+                        <span className="truncate">{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </SheetContent>
+            </Sheet>
             <div className="size-7 rounded-lg flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
               <Leaf className="size-4 text-primary-foreground" />
             </div>
