@@ -84,10 +84,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <header className="h-14 border-b border-border bg-background/60 backdrop-blur-xl sticky top-0 z-30 flex items-center px-4 md:px-6 gap-3">
           <div className="md:hidden flex items-center gap-2">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <button className="p-1 -ml-1 mr-1">
-                  <Menu className="size-5" />
-                </button>
+              <SheetTrigger className="p-2 border rounded-md mr-2 bg-background flex items-center justify-center">
+                <Menu className="size-5" />
               </SheetTrigger>
               <SheetContent side="left" className="w-64 p-0 bg-sidebar border-r-sidebar-border flex flex-col h-full">
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
