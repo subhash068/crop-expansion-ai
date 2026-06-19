@@ -6,7 +6,13 @@ import { Languages, Sprout, Droplets, AlertTriangle } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/advisory")({
-  head: () => ({ meta: [{ title: "Advisory Center — CropVision AI" }] }),
+  head: () => ({
+    meta: [
+      { title: "Advisory Center — Fertilizer & Crop Advisories AP | CropVision AI" },
+      { name: "description", content: "AI crop diversification and fertilizer advisories for farmers in Andhra Pradesh. Synced with Rythu Bharosa Kendras (RSK) for SMS and mobile alerts." },
+      { name: "keywords", content: "fertilizer advisory system, parcel-level soil health, precision agriculture Andhra Pradesh, crop diversification AP" }
+    ]
+  }),
   component: Advisory,
 });
 
@@ -68,6 +74,24 @@ function Advisory() {
           </div>
         }
       />
+
+      <div className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="text-sm font-semibold flex items-center gap-2 text-primary">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            Rythu Bharosa Kendra (RSK) Integration Active
+          </div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            Advisories are automatically synced with local RSK channels and ready for dissemination via regional SMS campaigns and mobile notifications in Telugu.
+          </div>
+        </div>
+        <button className="h-8 px-4 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors self-start md:self-auto shrink-0 shadow-sm">
+          Trigger Broadcast Campaign
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {advisories.slice(0, 60).map((a) => {

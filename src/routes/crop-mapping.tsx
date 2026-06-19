@@ -9,7 +9,13 @@ import { chartTooltip } from "./index";
 import { useMemo, useState, useEffect } from "react";
 
 export const Route = createFileRoute("/crop-mapping")({
-  head: () => ({ meta: [{ title: "Crop Mapping Center — CropVision AI" }] }),
+  head: () => ({
+    meta: [
+      { title: "Crop Mapping Center — Satellite Crop Classification AP | CropVision AI" },
+      { name: "description", content: "AI parcel-level crop classification in Andhra Pradesh using Planet 3m and Sentinel-2 satellite imagery. Validated against e-Panta ground-truth surveys." },
+      { name: "keywords", content: "AI soil mapping, satellite-based soil estimation, precision agriculture Andhra Pradesh, parcel-level crop mapping" }
+    ]
+  }),
   component: CropMapping,
 });
 

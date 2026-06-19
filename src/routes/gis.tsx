@@ -7,7 +7,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/gis")({
-  head: () => ({ meta: [{ title: "GIS Map Center — CropVision AI" }] }),
+  head: () => ({
+    meta: [
+      { title: "GIS Map Center — Precision Agriculture Andhra Pradesh | CropVision AI" },
+      { name: "description", content: "Interactive parcel-level GIS map for Anantapur district, Andhra Pradesh. Crop classification, suitability mapping, and satellite-based soil estimations." },
+      { name: "keywords", content: "precision agriculture Andhra Pradesh, satellite-based soil estimation, AI soil mapping, parcel-level soil health" }
+    ]
+  }),
   component: GIS,
 });
 

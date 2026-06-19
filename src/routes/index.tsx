@@ -9,8 +9,9 @@ import { useGroundTruth, useParcels, useYield, cropCategory, groupBy, sum, uniq 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Executive Dashboard — CropVision AI" },
-      { name: "description", content: "District-wide KPIs, crop distribution, mandal rankings and diversification overview for Anantapur." },
+      { title: "Executive Dashboard — Precision Agriculture Andhra Pradesh | CropVision AI" },
+      { name: "description", content: "District-wide agricultural KPIs, satellite-based soil estimation, crop distribution, and diversification overview for Anantapur, AP. Powered by e-Panta & APSDPS." },
+      { name: "keywords", content: "precision agriculture Andhra Pradesh, satellite-based soil estimation, AI soil mapping, parcel-level soil health" }
     ],
   }),
   component: Dashboard,
@@ -62,7 +63,7 @@ function Dashboard() {
     <AppLayout>
       <PageHeader
         title="Executive Dashboard"
-        subtitle="Real-time agricultural intelligence — Anantapur District, AP"
+        subtitle="Real-time agricultural intelligence powered by e-Panta & APSDPS — Anantapur District, AP"
         actions={<Badge variant="success">● Live · Kharif 2025</Badge>}
       />
 
