@@ -80,7 +80,7 @@ function Distribution() {
               <Pie data={cropPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={100} paddingAngle={2}>
                 {cropPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
-              <Tooltip contentStyle={chartTooltip} />
+              <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
             </PieChart>
           </ResponsiveContainer>

@@ -54,7 +54,7 @@ function Soil() {
               <Pie data={typePie} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90}>
                 {typePie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
-              <Tooltip contentStyle={chartTooltip} />
+              <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
               <Legend wrapperStyle={{ fontSize: 10 }} />
             </PieChart>
           </ResponsiveContainer>

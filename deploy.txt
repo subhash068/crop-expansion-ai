@@ -1,0 +1,8 @@
+you need to log in to Cloudflare from your terminal. Please run the following command:
+    npx wrangler login
+
+npm run build
+
+Deploy the built app (this uploads the new code to Cloudflare):
+    npx nitro deploy --prebuilt
+

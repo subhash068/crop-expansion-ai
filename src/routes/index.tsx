@@ -86,7 +86,7 @@ function Dashboard() {
               <Pie data={cropPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={95} paddingAngle={2}>
                 {cropPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
-              <Tooltip contentStyle={chartTooltip} />
+              <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
             </PieChart>
           </ResponsiveContainer>
@@ -182,4 +182,5 @@ export const chartTooltip = {
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: 8,
   fontSize: 12,
+  color: "#fff",
 };
