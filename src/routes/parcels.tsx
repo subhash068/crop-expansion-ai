@@ -149,7 +149,7 @@ function Parcels() {
                 <KpiCard label="Yield" value={`${detail.yield?.yield_kg_per_acre?.toFixed(0) ?? "—"} kg/ac`} icon={TrendingUp} accent="warning" />
               </div>
 
-              <Section title={`Parcel ${detail.base.parcel_id}`} subtitle={`${detail.base.village}, ${detail.base.mandal}`}>
+              <Section title={`Parcel ${detail.base.parcel_id}`} subtitle={`${detail.base.farmer_name} • ${detail.base.village}, ${detail.base.mandal}`}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
                   <Field label="Survey No." value={detail.base.survey_no} />
                   <Field label="Irrigation" value={detail.base.irrigation_type} />

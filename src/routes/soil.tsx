@@ -30,7 +30,22 @@ const RECOMMENDATIONS = {
 function Soil() {
   const s = useSoil().data ?? [];
   const kharif = s.filter((r) => r.season === "Kharif");
-  const avg = (k: keyof typeof s[number]) => kharif.length ? kharif.reduce((a, r) => a + (r[k] as number), 0) / kharif.length : 0;
+  const getFertilityScore = (r: typeof s[number]) => {
+    if (r.soil_fertility_score) return r.soil_fertility_score;
+    let score = 0;
+    score += Math.min(30, (r.nitrogen_kg_ha || 0) / 250 * 30);
+    score += Math.min(20, (r.phosphorus_kg_ha || 0) / 30 * 20);
+    score += Math.min(20, (r.potassium_kg_ha || 0) / 250 * 20);
+    score += Math.min(20, (r.organic_carbon || 0) / 0.8 * 20);
+    const ph = r.pH || 7.0;
+    score += 10 - Math.min(10, Math.abs(ph - 7.0) * 5);
+    return Math.max(0, Math.min(100, Math.round(score)));
+  };
+
+  const avg = (k: keyof typeof s[number]) => kharif.length ? kharif.reduce((a, r) => {
+    if (k === 'soil_fertility_score') return a + getFertilityScore(r);
+    return a + (r[k] as number || 0);
+  }, 0) / kharif.length : 0;
 
   const [selectedParcelId, setSelectedParcelId] = useState<string>("");
   const [selectedCrop, setSelectedCrop] = useState<keyof typeof RECOMMENDATIONS>("Millets");
@@ -59,9 +74,17 @@ function Soil() {
     const actualP = activeParcel.phosphorus_kg_ha ?? 0;
     const actualK = activeParcel.potassium_kg_ha ?? 0;
 
-    const defN = Math.max(0, targets.N - actualN);
-    const defP = Math.max(0, targets.P - actualP);
-    const defK = Math.max(0, targets.K - actualK);
+    // Adjust recommended fertilizer dose based on soil status (simplified STCR logic)
+    // Nitrogen status: Low < 280, Medium 280-560, High > 560
+    const adjustN = actualN < 280 ? 1.25 : actualN > 560 ? 0.75 : 1.0;
+    // Phosphorus status: Low < 10, Medium 10-25, High > 25
+    const adjustP = actualP < 10 ? 1.25 : actualP > 25 ? 0.75 : 1.0;
+    // Potassium status: Low < 110, Medium 110-280, High > 280
+    const adjustK = actualK < 110 ? 1.25 : actualK > 280 ? 0.75 : 1.0;
+
+    const defN = targets.N * adjustN;
+    const defP = targets.P * adjustP;
+    const defK = targets.K * adjustK;
 
     // Urea has 46% N, Single Superphosphate (SSP) has 16% P2O5, Muriate of Potash (MOP) has 60% K2O
     const urea = Math.round(defN / 0.46);
@@ -256,7 +279,7 @@ function Soil() {
                   <td className="p-2.5">{r.potassium_kg_ha}</td>
                   <td className="p-2.5">{r.zinc_ppm}</td>
                   <td className="p-2.5">{r.drainage_class}</td>
-                  <td className="p-2.5 font-semibold">{r.soil_fertility_score}</td>
+                  <td className="p-2.5 font-semibold">{getFertilityScore(r)}</td>
                 </tr>
               ))}
             </tbody>

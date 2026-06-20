@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { KpiCard, Section, Badge } from "@/components/Kpi";
-import { useGroundTruth, groupBy, sum, MILLETS, OILSEEDS } from "@/lib/data";
+import { useGroundTruth, groupBy, sum, MILLETS, OILSEEDS, PULSES } from "@/lib/data";
 import { BadgeCheck, Target, Users, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { chartTooltip } from "./index";
@@ -17,25 +17,33 @@ function Schemes() {
   const kharif = gt.filter((g) => g.season === "Kharif");
 
   const mandalScore = useMemo(() => Object.entries(groupBy(kharif, (g) => g.mandal)).map(([mandal, list]) => {
-    const millets = sum(list.filter((g) => MILLETS.includes(g.crop_type)), (g) => g.land_area_acres);
+    const nfsmCrops = sum(list.filter((g) => MILLETS.includes(g.crop_type) || PULSES.includes(g.crop_type)), (g) => g.land_area_acres);
     const oilseeds = sum(list.filter((g) => OILSEEDS.includes(g.crop_type)), (g) => g.land_area_acres);
-    const total = sum(list, (g) => g.land_area_acres);
+    const total = sum(list, (g) => g.land_area_acres) || 1;
     return {
       mandal,
-      NFSM: Math.round((millets / total) * 100),
+      NFSM: Math.round((nfsmCrops / total) * 100),
       NMEO: Math.round((oilseeds / total) * 100),
     };
   }).sort((a, b) => (b.NFSM + b.NMEO) - (a.NFSM + a.NMEO)).slice(0, 12), [kharif]);
 
   const beneficiaries = Math.round(kharif.length * 0.62);
 
+  // Calculate overall metrics
+  const totalAcres = sum(kharif, g => g.land_area_acres) || 1;
+  const totalNfsm = sum(kharif.filter((g) => MILLETS.includes(g.crop_type) || PULSES.includes(g.crop_type)), g => g.land_area_acres);
+  const totalNmeo = sum(kharif.filter((g) => OILSEEDS.includes(g.crop_type)), g => g.land_area_acres);
+  
+  const nfsmCoverage = Math.round((totalNfsm / totalAcres) * 100);
+  const nmeoCoverage = Math.round((totalNmeo / totalAcres) * 100);
+
   return (
     <AppLayout>
       <PageHeader title="Scheme Monitoring" subtitle="NFSM & NMEO progress dashboards" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Beneficiaries (Est.)" value={beneficiaries.toLocaleString()} icon={Users} />
-        <KpiCard label="NFSM Coverage" value="62%" icon={BadgeCheck} accent="info" />
-        <KpiCard label="NMEO Coverage" value="48%" icon={Target} accent="accent" />
+        <KpiCard label="NFSM Coverage" value={`${nfsmCoverage}%`} icon={BadgeCheck} accent="info" />
+        <KpiCard label="NMEO Coverage" value={`${nmeoCoverage}%`} icon={Target} accent="accent" />
         <KpiCard label="Expansion Progress" value="+14%" icon={TrendingUp} accent="warning" trend={{ value: "vs 2024", positive: true }} />
       </div>
 

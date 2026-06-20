@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section, Badge } from "@/components/Kpi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useParcels, useGroundTruth, useSuitability, useYield, cropCategory } from "@/lib/data";
+import { useParcels, useGroundTruth, useSuitability, useYield, useSoil, useWeather, cropCategory } from "@/lib/data";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 
@@ -29,6 +29,8 @@ function GIS() {
   const gt = useGroundTruth().data ?? [];
   const suit = useSuitability().data ?? [];
   const yields = useYield().data ?? [];
+  const soil = useSoil().data ?? [];
+  const weather = useWeather().data ?? [];
   const [layer, setLayer] = useState<LayerKey>("crop");
 
   const [district, setDistrict] = useState<string>("All");
@@ -45,6 +47,8 @@ function GIS() {
   const gMap = useMemo(() => new Map<string, any>(gt.filter((g: any) => g.season === "Kharif").map((g: any) => [g.parcel_id, g])), [gt]);
   const suitMap = useMemo(() => new Map<string, any>(suit.filter((s: any) => s.season === "Kharif").map((s: any) => [s.parcel_id, s])), [suit]);
   const yMap = useMemo(() => new Map<string, any>(yields.filter((y: any) => y.season === "Kharif").map((y: any) => [y.parcel_id, y])), [yields]);
+  const soilMap = useMemo(() => new Map<string, any>(soil.filter((s: any) => s.season === "Kharif").map((s: any) => [s.parcel_id, s])), [soil]);
+  const weatherMap = useMemo(() => new Map<string, any>(weather.filter((w: any) => w.season === "Kharif").map((w: any) => [w.parcel_id, w])), [weather]);
 
   const filteredParcels = useMemo(() => {
     return parcels.filter((p: any) => {
@@ -128,7 +132,7 @@ function GIS() {
 
       <Section title="" className="!p-0 overflow-hidden relative z-0">
         <ClientOnly fallback={<div className="h-[600px] flex items-center justify-center text-muted-foreground">Loading map…</div>}>
-          <MapView parcels={filteredParcels} layer={layer} gMap={gMap} suitMap={suitMap} onParcelClick={(p: any) => setSelectedParcel({ p, g: gMap.get(p.parcel_id), s: suitMap.get(p.parcel_id), y: yMap.get(p.parcel_id) })} />
+          <MapView parcels={filteredParcels} layer={layer} gMap={gMap} suitMap={suitMap} onParcelClick={(p: any) => setSelectedParcel({ p, g: gMap.get(p.parcel_id), s: suitMap.get(p.parcel_id), y: yMap.get(p.parcel_id), soil: soilMap.get(p.parcel_id), weather: weatherMap.get(p.parcel_id) })} />
         </ClientOnly>
         
         <div className="absolute bottom-6 left-6 z-[400] bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border shadow-xl min-w-[180px]">
@@ -162,7 +166,7 @@ function GIS() {
             <div className="flex items-center justify-between p-5 border-b border-border/50">
               <div>
                 <h3 className="text-lg font-bold">{selectedParcel.p.parcel_id}</h3>
-                <p className="text-sm text-muted-foreground">{selectedParcel.p.village}, {selectedParcel.p.mandal}</p>
+                <p className="text-sm text-muted-foreground">{selectedParcel.p.farmer_name} • {selectedParcel.p.village}, {selectedParcel.p.mandal}</p>
               </div>
               <button onClick={() => setSelectedParcel(null)} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -186,7 +190,7 @@ function GIS() {
                 </div>
               </div>
 
-              {selectedParcel.g && (
+              {layer === "crop" && selectedParcel.g && (
                 <div>
                   <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Current Crop</h4>
                   <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-3">
@@ -206,7 +210,7 @@ function GIS() {
                 </div>
               )}
 
-              {selectedParcel.s && (
+              {layer === "suitability" && selectedParcel.s && (
                 <div>
                   <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Suitability Analysis</h4>
                   <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-3">
@@ -223,15 +227,69 @@ function GIS() {
                       <p className="text-sm text-muted-foreground">Recommended</p>
                       <p className="font-medium text-emerald-500">{selectedParcel.s.recommended_crop}</p>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {layer === "expansion" && selectedParcel.s && (
+                <div>
+                  <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Expansion Potential</h4>
+                  <div className="bg-muted/30 p-4 rounded-lg border border-border/50 space-y-3">
                     <div className="flex justify-between items-center">
-                      <p className="text-sm text-muted-foreground">Expansion</p>
+                      <p className="text-sm text-muted-foreground">Recommended</p>
+                      <p className="font-medium text-emerald-500">{selectedParcel.s.recommended_crop}</p>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <p className="text-sm text-muted-foreground">Potential</p>
                       <Badge variant={selectedParcel.s.diversification_potential === "High" ? "success" : selectedParcel.s.diversification_potential === "Medium" ? "warning" : "danger"}>
-                        {selectedParcel.s.diversification_potential} Potential
+                        {selectedParcel.s.diversification_potential}
                       </Badge>
                     </div>
                   </div>
                 </div>
               )}
+
+              {/* Show additional detail components depending on the mode, or always show them if there's space */}
+              {selectedParcel.soil && (
+                <div>
+                  <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Soil Health</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="bg-muted/20 p-2 rounded border border-border/30">
+                      <p className="text-[10px] text-muted-foreground uppercase">Texture</p>
+                      <p className="font-medium truncate">{selectedParcel.soil.soil_texture}</p>
+                    </div>
+                    <div className="bg-muted/20 p-2 rounded border border-border/30">
+                      <p className="text-[10px] text-muted-foreground uppercase">pH</p>
+                      <p className="font-medium truncate">{selectedParcel.soil.pH}</p>
+                    </div>
+                    <div className="bg-muted/20 p-2 rounded border border-border/30">
+                      <p className="text-[10px] text-muted-foreground uppercase">Organic C</p>
+                      <p className="font-medium truncate">{selectedParcel.soil.organic_carbon}%</p>
+                    </div>
+                    <div className="bg-muted/20 p-2 rounded border border-border/30">
+                      <p className="text-[10px] text-muted-foreground uppercase">N-P-K</p>
+                      <p className="font-medium truncate">{selectedParcel.soil.nitrogen_kg_ha}-{selectedParcel.soil.phosphorus_kg_ha}-{selectedParcel.soil.potassium_kg_ha}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {selectedParcel.weather && (
+                <div>
+                  <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">Weather Profile</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="bg-muted/20 p-2 rounded border border-border/30">
+                      <p className="text-[10px] text-muted-foreground uppercase">Rainfall</p>
+                      <p className="font-medium truncate">{selectedParcel.weather.total_rainfall_mm} mm</p>
+                    </div>
+                    <div className="bg-muted/20 p-2 rounded border border-border/30">
+                      <p className="text-[10px] text-muted-foreground uppercase">Avg Temp</p>
+                      <p className="font-medium truncate">{selectedParcel.weather.avg_temperature_c}°C</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         )}

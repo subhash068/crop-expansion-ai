@@ -66,8 +66,17 @@ function Weather() {
     };
   }), [w]);
 
+  const getDroughtRisk = (r: typeof w[number]) => {
+    if (r.drought_risk) return r.drought_risk;
+    // Fallback heuristic based on rainfall
+    if (r.total_rainfall_mm < 300) return "High";
+    if (r.total_rainfall_mm < 500) return "Medium";
+    return "Low";
+  };
+
   const droughtBreak = useMemo(() => {
-    const byRisk = groupBy(w.filter((x) => x.season === "Kharif"), (r) => r.drought_risk);
+    const kharifW = w.filter((x) => x.season === "Kharif");
+    const byRisk = groupBy(kharifW, getDroughtRisk);
     return [
       { risk: "Low", count: byRisk.Low?.length ?? 0 },
       { risk: "Medium", count: byRisk.Medium?.length ?? 0 },

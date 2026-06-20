@@ -3,6 +3,7 @@ import Papa from "papaparse";
 
 export type ParcelRow = {
   parcel_id: string;
+  farmer_name: string;
   district: string;
   mandal: string;
   village: string;
@@ -19,7 +20,7 @@ export type ParcelRow = {
 };
 
 export type GroundTruthRow = {
-  parcel_id: string; district: string; mandal: string; village: string;
+  parcel_id: string; farmer_name: string; district: string; mandal: string; village: string;
   survey_no: string; latitude: number; longitude: number;
   land_area_acres: number; irrigation_type: string; soil_type: string;
   season: string; year: number; crop_type: string; crop_stage: string;
