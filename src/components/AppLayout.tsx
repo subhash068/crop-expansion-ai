@@ -133,15 +133,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
             <span className="font-semibold text-sm">CropVision AI</span>
           </div>
-          <div className="hidden md:flex items-center gap-2 flex-1 max-w-md">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-              <input
-                placeholder="Search parcel, village, mandal..."
-                className="w-full h-9 rounded-lg bg-muted/50 border border-border pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/50"
-              />
-            </div>
-          </div>
           <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setDark((d) => !d)}

@@ -34,6 +34,10 @@ function Soil() {
 
   const [selectedParcelId, setSelectedParcelId] = useState<string>("");
   const [selectedCrop, setSelectedCrop] = useState<keyof typeof RECOMMENDATIONS>("Millets");
+  const [page, setPage] = useState(1);
+  const pageSize = 45;
+  const totalPages = Math.ceil(kharif.length / pageSize);
+  const paginatedRows = useMemo(() => kharif.slice((page - 1) * pageSize, page * pageSize), [kharif, page, pageSize]);
 
   // Fallback to first parcel if none is selected
   const activeParcel = useMemo(() => {
@@ -233,14 +237,14 @@ function Soil() {
         </Section>
       )}
 
-      <Section title="Parcel Soil Health Records" subtitle={`${kharif.length} total · top 40 shown`} className="mt-4">
+      <Section title="Parcel Soil Health Records" subtitle={kharif.length > 0 ? `Showing ${(page - 1) * pageSize + 1} to ${Math.min(page * pageSize, kharif.length)} of ${kharif.length} parcels` : "No records found"} className="mt-4">
         <div className="overflow-auto rounded-lg border border-border">
           <table className="w-full text-xs">
             <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px]">
               <tr>{["Parcel", "Type", "Texture", "pH", "OC %", "N", "P", "K", "Zn", "Drainage", "Fertility"].map(h => <th key={h} className="text-left p-2.5">{h}</th>)}</tr>
             </thead>
             <tbody>
-              {kharif.slice(0, 40).map((r) => (
+              {paginatedRows.map((r) => (
                 <tr key={r.parcel_id} onClick={() => setSelectedParcelId(r.parcel_id)} className="border-t border-border hover:bg-muted/20 cursor-pointer">
                   <td className="p-2.5 font-mono text-primary hover:underline">{r.parcel_id}</td>
                   <td className="p-2.5">{r.soil_type}</td>
@@ -258,6 +262,30 @@ function Soil() {
             </tbody>
           </table>
         </div>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 text-sm">
+            <span className="text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setPage(p => Math.max(1, p - 1))} 
+                disabled={page === 1}
+                className="px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-xs font-semibold"
+              >
+                Previous
+              </button>
+              <button 
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
+                disabled={page === totalPages}
+                className="px-3 py-1.5 rounded-md border border-border hover:bg-muted disabled:opacity-50 disabled:hover:bg-transparent transition-colors text-xs font-semibold"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </Section>
     </AppLayout>
   );

@@ -115,8 +115,17 @@
   --sidebar: oklch(0.97 0.01 145);
   --sidebar-foreground: oklch(0.16 0.025 160);
   --sidebar-primary: oklch(0.55 0.17 145);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
   --sidebar-accent: oklch(0.92 0.01 145);
+  --sidebar-accent-foreground: oklch(0.16 0.025 160);
   --sidebar-border: oklch(0 0 0 / 0.08);
+  --sidebar-ring: oklch(0.55 0.17 145);
+
+  --gradient-primary: linear-gradient(135deg, oklch(0.55 0.17 145), oklch(0.45 0.18 165));
+  --gradient-accent: linear-gradient(135deg, oklch(0.7 0.18 75), oklch(0.6 0.18 60));
+  --gradient-surface: linear-gradient(180deg, oklch(1 0 0 / 0.75), oklch(0.97 0.005 130 / 0.5));
+  --shadow-glow: 0 0 40px -10px oklch(0.55 0.17 145 / 0.2);
+  --shadow-card: 0 8px 32px -8px oklch(0.16 0.025 160 / 0.06);
 }
 
 @layer base {
