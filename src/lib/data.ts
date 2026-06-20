@@ -101,6 +101,18 @@ export const useWeather = () =>
 export const useRotation = () =>
   useQuery({ queryKey: ["rotation"], queryFn: () => loadCsv<RotationRow>("Anantapur_Crop_Rotation_1500.csv"), ...opts });
 
+export const useLiveWeather = (lat?: number, lon?: number) => {
+  return useQuery({
+    queryKey: ["liveWeather", lat, lon],
+    queryFn: async () => {
+      if (!lat || !lon) return null;
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,rain_sum&timezone=Asia/Kolkata&forecast_days=14`);
+      return res.json();
+    },
+    enabled: !!lat && !!lon,
+  });
+};
+
 // Crop categories
 export const MILLETS = ["Pearl Millet", "Foxtail Millet", "Finger Millet", "Sorghum", "Little Millet", "Kodo Millet"];
 export const PULSES = ["Red Gram", "Green Gram", "Bengal Gram", "Black Gram", "Horse Gram"];
