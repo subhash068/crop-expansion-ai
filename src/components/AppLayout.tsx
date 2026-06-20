@@ -22,6 +22,7 @@ const nav = [
   { to: "/soil", label: "Soil Intelligence", icon: Mountain },
   { to: "/schemes", label: "Scheme Monitoring", icon: BadgeCheck },
   { to: "/advisory", label: "Advisory Center", icon: MessageSquare },
+  { to: "/campaigns", label: "Campaign Logs", icon: MessageSquare },
   { to: "/farmer", label: "Farmer App", icon: Smartphone },
   { to: "/reports", label: "Reports", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
@@ -31,10 +32,23 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [dark, setDark] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.toggle("light", !dark);
   }, [dark]);
+
+  useEffect(() => {
+    const fetchNotifications = () => {
+      const apps = JSON.parse(localStorage.getItem('rsk_applications') || '[]');
+      setNotifications(apps);
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 2000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen flex w-full">
@@ -142,10 +156,48 @@ export function AppLayout({ children }: { children: ReactNode }) {
             >
               {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
-            <button className="size-9 rounded-lg border border-border hover:bg-muted flex items-center justify-center relative">
-              <Bell className="size-4" />
-              <span className="absolute top-1.5 right-1.5 size-1.5 rounded-full bg-accent" />
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="size-9 rounded-lg border border-border hover:bg-muted flex items-center justify-center relative"
+              >
+                <Bell className="size-4" />
+                {notifications.length > 0 && (
+                  <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 animate-pulse border-2 border-background" />
+                )}
+              </button>
+              
+              {showNotifications && (
+                <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border shadow-xl rounded-xl overflow-hidden z-50">
+                  <div className="p-3 bg-muted/50 border-b border-border font-semibold text-sm flex items-center justify-between">
+                    RSK Applications
+                    <span className="text-xs font-normal text-muted-foreground">{notifications.length} new</span>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-6 text-center text-muted-foreground text-sm">
+                        No new applications
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-border/50">
+                        {notifications.map((notif: any, i: number) => (
+                          <div key={i} className="p-3 hover:bg-muted/30 transition-colors flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-semibold">{notif.farmer_name}</span>
+                              <span className="text-[10px] text-muted-foreground font-mono">{notif.parcel_id}</span>
+                            </div>
+                            <p className="text-xs leading-snug text-muted-foreground">
+                              Applied for <strong className="text-foreground">{notif.crop}</strong> subsidy in {notif.village}.
+                            </p>
+                            <div className="text-[10px] text-muted-foreground mt-1">{notif.date}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <div className="size-9 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-xs font-bold text-primary-foreground">
               AO
             </div>

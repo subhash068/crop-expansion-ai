@@ -22,6 +22,7 @@ import { Route as ExpansionRouteImport } from './routes/expansion'
 import { Route as DiversificationRouteImport } from './routes/diversification'
 import { Route as DistributionRouteImport } from './routes/distribution'
 import { Route as CropMappingRouteImport } from './routes/crop-mapping'
+import { Route as CampaignsRouteImport } from './routes/campaigns'
 import { Route as AdvisoryRouteImport } from './routes/advisory'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -90,6 +91,11 @@ const CropMappingRoute = CropMappingRouteImport.update({
   path: '/crop-mapping',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CampaignsRoute = CampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdvisoryRoute = AdvisoryRouteImport.update({
   id: '/advisory',
   path: '/advisory',
@@ -104,6 +110,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/advisory': typeof AdvisoryRoute
+  '/campaigns': typeof CampaignsRoute
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/advisory': typeof AdvisoryRoute
+  '/campaigns': typeof CampaignsRoute
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/advisory': typeof AdvisoryRoute
+  '/campaigns': typeof CampaignsRoute
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/advisory'
+    | '/campaigns'
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/advisory'
+    | '/campaigns'
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/advisory'
+    | '/campaigns'
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
@@ -210,6 +222,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdvisoryRoute: typeof AdvisoryRoute
+  CampaignsRoute: typeof CampaignsRoute
   CropMappingRoute: typeof CropMappingRoute
   DistributionRoute: typeof DistributionRoute
   DiversificationRoute: typeof DiversificationRoute
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CropMappingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/campaigns': {
+      id: '/campaigns'
+      path: '/campaigns'
+      fullPath: '/campaigns'
+      preLoaderRoute: typeof CampaignsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/advisory': {
       id: '/advisory'
       path: '/advisory'
@@ -338,6 +358,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdvisoryRoute: AdvisoryRoute,
+  CampaignsRoute: CampaignsRoute,
   CropMappingRoute: CropMappingRoute,
   DistributionRoute: DistributionRoute,
   DiversificationRoute: DiversificationRoute,

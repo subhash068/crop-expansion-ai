@@ -119,6 +119,23 @@ function Advisory() {
             setTimeout(() => {
               setIsBroadcasting(false);
               setBroadcasted(true);
+
+              // Save to localStorage
+              const existing = JSON.parse(localStorage.getItem('rsk_campaigns') || '[]');
+              const newCampaign = {
+                id: `CAMP-${Math.floor(Math.random() * 10000)}`,
+                date: new Date().toLocaleString(),
+                count: advisories.length,
+                status: "Delivered",
+                messages: advisories.map(a => ({
+                  farmer: a.farmer_name,
+                  parcel: a.parcel_id,
+                  type: a.type,
+                  text: a.msg
+                }))
+              };
+              localStorage.setItem('rsk_campaigns', JSON.stringify([newCampaign, ...existing]));
+
               import('sonner').then(({ toast }) => {
                 toast.success("Broadcast Campaign Sent", {
                   description: "Advisories have been dispatched to all eligible farmers via RSK SMS gateways.",

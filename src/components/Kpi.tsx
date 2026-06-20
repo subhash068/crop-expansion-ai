@@ -64,7 +64,7 @@ export function Section({ title, subtitle, action, children, className = "" }: {
   );
 }
 
-export function Badge({ children, variant = "default" }: { children: ReactNode; variant?: "default" | "success" | "warning" | "danger" | "info" }) {
+export function Badge({ children, variant = "default", className = "" }: { children: ReactNode; variant?: "default" | "success" | "warning" | "danger" | "info"; className?: string }) {
   const colors = {
     default: "bg-muted text-muted-foreground border-border",
     success: "bg-success/15 text-success border-success/30",
@@ -73,7 +73,7 @@ export function Badge({ children, variant = "default" }: { children: ReactNode; 
     info: "bg-info/15 text-info border-info/30",
   }[variant];
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium border ${colors}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium border ${colors} ${className}`}>
       {children}
     </span>
   );

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useGroundTruth, useSuitability, useWeather, useSoil, useYield, cropCategory } from "@/lib/data";
 import { Leaf, Map, Bell, Search, CloudRain, Droplets, ArrowRight, LineChart, MessageSquare, Send, CheckCircle2, Bot, Sun, ArrowLeft } from "lucide-react";
 import { usePredictCrop } from "@/lib/api";
@@ -38,6 +38,26 @@ function FarmerApp() {
   const parcelSuit = useMemo(() => suitData.find(s => s.parcel_id === loggedInParcel), [suitData, loggedInParcel]);
   const parcelYield = useMemo(() => yieldData.find(y => y.parcel_id === loggedInParcel), [yieldData, loggedInParcel]);
 
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  useEffect(() => {
+    if (!loggedInParcel) return;
+    
+    const fetchNotifications = () => {
+      const campaigns = JSON.parse(localStorage.getItem('rsk_campaigns') || '[]');
+      const myNotifs = campaigns.flatMap((c: any) => 
+        c.messages.filter((m: any) => m.parcel === loggedInParcel)
+          .map((m: any) => ({ ...m, date: c.date, campId: c.id }))
+      );
+      setNotifications(myNotifs);
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 2000);
+    return () => clearInterval(interval);
+  }, [loggedInParcel]);
+
   // Mobile App Container
   return (
     <div className="h-[100dvh] bg-black/95 text-foreground flex justify-center overflow-hidden relative">
@@ -52,22 +72,66 @@ function FarmerApp() {
       <div className="w-full max-w-md bg-background h-full relative shadow-2xl flex flex-col">
         
         {/* Header */}
-        <header className="p-4 border-b border-border/50 bg-background/80 backdrop-blur sticky top-0 z-10 flex justify-between items-center">
+        <header className="p-4 border-b border-border/50 bg-background/80 backdrop-blur sticky top-0 z-30 flex justify-between items-center">
           <div className="font-semibold text-lg flex items-center gap-2 text-primary">
             <Leaf className="size-5" /> CropVision
           </div>
-          <div className="flex gap-2 items-center">
+          <div className="flex gap-3 items-center">
             {loggedInParcel && (
-              <div className="text-xs font-mono bg-muted px-2 py-1 rounded text-muted-foreground">
+              <div className="text-xs font-mono bg-muted px-2 py-1 rounded text-muted-foreground hidden sm:block">
                 {loggedInParcel}
               </div>
             )}
+            
+            {loggedInParcel && (
+              <div className="relative">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)}
+                  className="relative p-1.5 hover:bg-muted rounded-full transition-colors"
+                >
+                  <Bell className="size-5 text-foreground" />
+                  {notifications.length > 0 && (
+                    <span className="absolute top-1 right-1 size-2.5 bg-red-500 rounded-full border-2 border-background animate-pulse" />
+                  )}
+                </button>
+                
+                {showNotifications && (
+                  <div className="absolute right-0 top-full mt-2 w-72 bg-card border border-border shadow-xl rounded-xl overflow-hidden z-50">
+                    <div className="p-3 bg-muted/50 border-b border-border font-semibold text-sm flex items-center justify-between">
+                      RSK SMS Alerts
+                      <span className="text-xs font-normal text-muted-foreground">{notifications.length} alerts</span>
+                    </div>
+                    <div className="max-h-80 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-6 text-center text-muted-foreground text-sm">
+                          No new alerts
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-border/50">
+                          {notifications.map((notif, i) => (
+                            <div key={i} className="p-3 hover:bg-muted/30 transition-colors">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <span className="size-2 bg-emerald-500 rounded-full shrink-0" />
+                                <span className="text-xs text-muted-foreground font-medium truncate">Government of AP</span>
+                              </div>
+                              <p className="text-sm leading-snug">{notif.text}</p>
+                              <div className="text-[10px] text-muted-foreground mt-2 text-right">{notif.date}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <select 
               value={lang}
               onChange={(e) => setLang(e.target.value as "en" | "te")}
-              className="text-xs bg-muted px-2 py-1 rounded text-primary font-medium hover:bg-muted/80 outline-none cursor-pointer border-none"
+              className="text-xs bg-muted px-2 py-1.5 rounded-lg text-primary font-medium hover:bg-muted/80 outline-none cursor-pointer border-none"
             >
-              <option value="en">English</option>
+              <option value="en">ENG</option>
               <option value="te">తెలుగు</option>
             </select>
           </div>
