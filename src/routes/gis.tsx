@@ -165,8 +165,12 @@ function GIS() {
           <div className="absolute top-0 right-0 h-full w-[380px] bg-background/95 backdrop-blur-xl border-l border-border shadow-2xl z-[500] flex flex-col transform transition-transform animate-in slide-in-from-right">
             <div className="flex items-center justify-between p-5 border-b border-border/50">
               <div>
-                <h3 className="text-lg font-bold">{selectedParcel.p.parcel_id}</h3>
-                <p className="text-sm text-muted-foreground">{selectedParcel.p.farmer_name} • {selectedParcel.p.village}, {selectedParcel.p.mandal}</p>
+                <h3 className="text-lg font-bold"><span className="text-xs font-normal text-muted-foreground uppercase tracking-wider mr-2">Parcel ID:</span>{selectedParcel.p.parcel_id}</h3>
+                <div className="flex flex-col gap-0.5 mt-2 text-sm text-muted-foreground">
+                  <div><span className="font-medium text-foreground">Farmer Name:</span> {selectedParcel.p.farmer_name}</div>
+                  <div><span className="font-medium text-foreground">Village:</span> {selectedParcel.p.village}</div>
+                  <div><span className="font-medium text-foreground">Mandal:</span> {selectedParcel.p.mandal}</div>
+                </div>
               </div>
               <button onClick={() => setSelectedParcel(null)} className="p-2 rounded-full hover:bg-muted text-muted-foreground">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

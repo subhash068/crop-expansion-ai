@@ -48,7 +48,7 @@ export function KpiCard({
 }
 
 export function Section({ title, subtitle, action, children, className = "" }: {
-  title: string; subtitle?: string; action?: ReactNode; children: ReactNode; className?: string;
+  title: ReactNode; subtitle?: ReactNode; action?: ReactNode; children: ReactNode; className?: string;
 }) {
   return (
     <div className={`glass rounded-xl p-5 ${className}`}>

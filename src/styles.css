@@ -130,7 +130,11 @@
 
 @layer base {
   * { border-color: var(--color-border); }
-  html, body { background-color: var(--color-background); color: var(--color-foreground); }
+  html, body { 
+    background-color: var(--color-background); 
+    color: var(--color-foreground); 
+    color-scheme: dark;
+  }
   body {
     background-image:
       radial-gradient(at 0% 0%, oklch(0.72 0.17 145 / 0.08) 0px, transparent 50%),
@@ -158,4 +162,24 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-muted) var(--color-background);
 }
