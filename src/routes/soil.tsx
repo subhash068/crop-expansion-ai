@@ -3,7 +3,8 @@ import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer,
 import { Mountain, FlaskConical, Leaf, Activity, Beaker, HelpCircle } from "lucide-react";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { KpiCard, Section } from "@/components/Kpi";
-import { useSoil, groupBy } from "@/lib/data";
+import { useSoil, useParcels, groupBy } from "@/lib/data";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { chartTooltip } from "./index";
 import { useMemo, useState } from "react";
 
@@ -29,7 +30,31 @@ const RECOMMENDATIONS = {
 
 function Soil() {
   const s = useSoil().data ?? [];
-  const kharif = s.filter((r) => r.season === "Kharif");
+  const parcelsData = useParcels().data ?? [];
+  const [district, setDistrict] = useState<string>("All");
+  const [mandal, setMandal] = useState<string>("All");
+  const [village, setVillage] = useState<string>("All");
+  const [season, setSeason] = useState<string>("Kharif");
+
+  const districts = useMemo(() => ["All", ...new Set(parcelsData.map((p: any) => p.district).filter(Boolean))] as string[], [parcelsData]);
+  const mandals = useMemo(() => ["All", ...new Set(parcelsData.filter((p: any) => district === "All" || p.district === district).map((p: any) => p.mandal).filter(Boolean))] as string[], [parcelsData, district]);
+  const villages = useMemo(() => ["All", ...new Set(parcelsData.filter((p: any) => (district === "All" || p.district === district) && (mandal === "All" || p.mandal === mandal)).map((p: any) => p.village).filter(Boolean))] as string[], [parcelsData, district, mandal]);
+  const seasons = useMemo(() => ["All", ...new Set(s.map((r: any) => r.season).filter(Boolean))] as string[], [s]);
+
+  const parcelMap = useMemo(() => new Map(parcelsData.map((p) => [p.parcel_id, p])), [parcelsData]);
+
+  const filteredData = useMemo(() => {
+    return s.filter((r) => {
+      if (season !== "All" && r.season !== season) return false;
+      const p = parcelMap.get(r.parcel_id) as any;
+      if (!p) return false;
+      if (district !== "All" && p.district !== district) return false;
+      if (mandal !== "All" && p.mandal !== mandal) return false;
+      if (village !== "All" && p.village !== village) return false;
+      return true;
+    });
+  }, [s, parcelMap, season, district, mandal, village]);
+
   const getFertilityScore = (r: typeof s[number]) => {
     if (r.soil_fertility_score) return r.soil_fertility_score;
     let score = 0;
@@ -42,30 +67,30 @@ function Soil() {
     return Math.max(0, Math.min(100, Math.round(score)));
   };
 
-  const avg = (k: keyof typeof s[number]) => kharif.length ? kharif.reduce((a, r) => {
+  const avg = (k: keyof typeof s[number]) => filteredData.length ? filteredData.reduce((a, r) => {
     if (k === 'soil_fertility_score') return a + getFertilityScore(r);
     return a + (r[k] as number || 0);
-  }, 0) / kharif.length : 0;
+  }, 0) / filteredData.length : 0;
 
   const [selectedParcelId, setSelectedParcelId] = useState<string>("");
   const [selectedCrop, setSelectedCrop] = useState<keyof typeof RECOMMENDATIONS>("Millets");
   const [page, setPage] = useState(1);
   const pageSize = 45;
-  const totalPages = Math.ceil(kharif.length / pageSize);
-  const paginatedRows = useMemo(() => kharif.slice((page - 1) * pageSize, page * pageSize), [kharif, page, pageSize]);
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const paginatedRows = useMemo(() => filteredData.slice((page - 1) * pageSize, page * pageSize), [filteredData, page, pageSize]);
 
   // Fallback to first parcel if none is selected
   const activeParcel = useMemo(() => {
-    if (!kharif.length) return null;
-    return kharif.find((p) => p.parcel_id === selectedParcelId) || kharif[0];
-  }, [kharif, selectedParcelId]);
+    if (!filteredData.length) return null;
+    return filteredData.find((p) => p.parcel_id === selectedParcelId) || filteredData[0];
+  }, [filteredData, selectedParcelId]);
 
   // Set initial selected parcel once data is loaded
   useMemo(() => {
-    if (kharif.length && !selectedParcelId) {
-      setSelectedParcelId(kharif[0].parcel_id);
+    if (filteredData.length && !selectedParcelId) {
+      setSelectedParcelId(filteredData[0].parcel_id);
     }
-  }, [kharif, selectedParcelId]);
+  }, [filteredData, selectedParcelId]);
 
   const advisoryData = useMemo(() => {
     if (!activeParcel) return null;
@@ -100,12 +125,12 @@ function Soil() {
   }, [activeParcel, selectedCrop]);
 
   const typePie = useMemo(() =>
-    Object.entries(groupBy(kharif, (r) => r.soil_type))
-      .map(([name, list]) => ({ name, value: list.length })), [kharif]);
+    Object.entries(groupBy(filteredData, (r) => r.soil_type))
+      .map(([name, list]) => ({ name, value: list.length })), [filteredData]);
 
   const drainage = useMemo(() =>
-    Object.entries(groupBy(kharif, (r) => r.drainage_class))
-      .map(([name, list]) => ({ name, count: list.length })), [kharif]);
+    Object.entries(groupBy(filteredData, (r) => r.drainage_class))
+      .map(([name, list]) => ({ name, count: list.length })), [filteredData]);
 
   const radar = [
     { metric: "pH (norm)", v: +(avg("pH") * 10).toFixed(0) },
@@ -119,6 +144,41 @@ function Soil() {
   return (
     <AppLayout>
       <PageHeader title="Soil Intelligence" subtitle="APSAC spatial soil maps · fertilizer advisory & nutrient profiling" />
+
+      <div className="flex gap-3 mb-6 mt-4 flex-wrap">
+        <Select value={season} onValueChange={(v) => { setSeason(v); setPage(1); }}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm w-[150px]">
+            <SelectValue placeholder="All Seasons" />
+          </SelectTrigger>
+          <SelectContent>
+            {seasons.map((d) => <SelectItem key={d as string} value={d as string}>{d === "All" ? "All Seasons" : d}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={district} onValueChange={(v) => { setDistrict(v); setMandal("All"); setVillage("All"); setPage(1); }}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm w-[150px]">
+            <SelectValue placeholder="All Districts" />
+          </SelectTrigger>
+          <SelectContent>
+            {districts.map((d) => <SelectItem key={d as string} value={d as string}>{d === "All" ? "All Districts" : d}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={mandal} onValueChange={(v) => { setMandal(v); setVillage("All"); setPage(1); }}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm w-[150px]">
+            <SelectValue placeholder="All Mandals" />
+          </SelectTrigger>
+          <SelectContent>
+            {mandals.map((m) => <SelectItem key={m as string} value={m as string}>{m === "All" ? "All Mandals" : m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={village} onValueChange={(v) => { setVillage(v); setPage(1); }}>
+          <SelectTrigger className="h-9 px-3 bg-muted/50 border-border text-sm w-[150px]">
+            <SelectValue placeholder="All Villages" />
+          </SelectTrigger>
+          <SelectContent>
+            {villages.map((m) => <SelectItem key={m as string} value={m as string}>{m === "All" ? "All Villages" : m}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Avg Fertility Score" value={`${Math.round(avg("soil_fertility_score"))}/100`} icon={Leaf} />
@@ -175,7 +235,7 @@ function Soil() {
                   onChange={(e) => setSelectedParcelId(e.target.value)}
                   className="w-full h-9 rounded-lg bg-muted/50 border border-border px-3 text-xs outline-none focus:ring-2 focus:ring-ring/50"
                 >
-                  {kharif.slice(0, 30).map((p) => (
+                  {filteredData.slice(0, 30).map((p) => (
                     <option key={p.parcel_id} value={p.parcel_id} className="bg-background">{p.parcel_id} ({p.soil_type})</option>
                   ))}
                 </select>
@@ -260,7 +320,7 @@ function Soil() {
         </Section>
       )}
 
-      <Section title="Parcel Soil Health Records" subtitle={kharif.length > 0 ? `Showing ${(page - 1) * pageSize + 1} to ${Math.min(page * pageSize, kharif.length)} of ${kharif.length} parcels` : "No records found"} className="mt-4">
+      <Section title="Parcel Soil Health Records" subtitle={filteredData.length > 0 ? `Showing ${(page - 1) * pageSize + 1} to ${Math.min(page * pageSize, filteredData.length)} of ${filteredData.length} parcels` : "No records found"} className="mt-4">
         <div className="overflow-auto rounded-lg border border-border">
           <table className="w-full text-xs">
             <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px]">

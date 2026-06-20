@@ -67,7 +67,7 @@ function Schemes() {
 
   return (
     <AppLayout>
-      <PageHeader title="Scheme Monitoring" subtitle="NFSM & NMEO progress dashboards & AI-driven target opportunities" />
+      <PageHeader title="NFSM & NMEO Schemes" subtitle="National Food Security Mission & National Mission on Edible Oils monitoring" />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KpiCard label="Beneficiaries (Est.)" value={beneficiaries.toLocaleString()} icon={Users} />
         <KpiCard label="NFSM Coverage" value={`${nfsmCoverage}%`} icon={BadgeCheck} accent="info" />

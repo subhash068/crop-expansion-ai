@@ -63,7 +63,7 @@ function Dashboard() {
     <AppLayout>
       <PageHeader
         title="Executive Dashboard"
-        subtitle="Real-time agricultural intelligence powered by e-Panta & APSDPS — Anantapur District, AP"
+        subtitle="Powered by e-Panta (Ground Truth), APSAC (Soil), APSDPS (Weather) & Planet/Sentinel-2 3m Imagery"
         actions={<Badge variant="success">● Live · Kharif 2025</Badge>}
       />
 

@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Satellite, MapPin, BarChart3, Sprout, Map,
   CloudRain, Mountain, BadgeCheck, MessageSquare, Globe2,
   Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search, Target, Menu,
-  Smartphone
+  Smartphone, TrendingUp
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -16,11 +16,11 @@ const nav = [
   { to: "/parcels", label: "Parcel Intelligence", icon: MapPin },
   { to: "/distribution", label: "Crop Distribution", icon: BarChart3 },
   { to: "/diversification", label: "Diversification Engine", icon: Sprout },
-  { to: "/expansion", label: "Expansion Engine", icon: Target },
+  { to: "/expansion", label: "Crop Expansion Engine", icon: TrendingUp },
   { to: "/suitability", label: "Suitability Mapping", icon: Map },
   { to: "/weather", label: "Weather Intelligence", icon: CloudRain },
   { to: "/soil", label: "Soil Intelligence", icon: Mountain },
-  { to: "/schemes", label: "Scheme Monitoring", icon: BadgeCheck },
+  { to: "/schemes", label: "NFSM & NMEO Schemes", icon: BadgeCheck },
   { to: "/advisory", label: "Advisory Center", icon: MessageSquare },
   { to: "/campaigns", label: "Campaign Logs", icon: MessageSquare },
   { to: "/farmer", label: "Farmer App", icon: Smartphone },
