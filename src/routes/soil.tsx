@@ -203,32 +203,32 @@ function Soil() {
               </div>
             </div>
 
-            <div className="glass rounded-xl p-4 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <span className="text-xs font-semibold text-muted-foreground block mb-3">Deficiency Assessment (kg/ha)</span>
-                <div className="space-y-3">
-                  {[
-                    { name: "Nitrogen (N)", actual: advisoryData.actual.N, target: advisoryData.targets.N, color: "var(--color-primary)" },
-                    { name: "Phosphorus (P)", actual: advisoryData.actual.P, target: advisoryData.targets.P, color: "var(--color-info)" },
-                    { name: "Potassium (K)", actual: advisoryData.actual.K, target: advisoryData.targets.K, color: "var(--color-accent)" },
-                  ].map((nut) => {
-                    const pct = Math.min(100, Math.round((nut.actual / Math.max(1, nut.target)) * 100));
-                    return (
-                      <div key={nut.name} className="text-xs">
-                        <div className="flex justify-between mb-1">
-                          <span className="font-medium">{nut.name}</span>
-                          <span className="text-muted-foreground font-mono">{nut.actual.toFixed(0)} / {nut.target} kg/ha</span>
-                        </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden flex">
-                          <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: nut.color }} />
-                        </div>
+            <div className="glass rounded-xl p-4">
+              <span className="text-xs font-semibold text-muted-foreground block mb-3">Deficiency Assessment (kg/ha)</span>
+              <div className="space-y-3">
+                {[
+                  { name: "Nitrogen (N)", actual: advisoryData.actual.N, target: advisoryData.targets.N, color: "var(--color-primary)" },
+                  { name: "Phosphorus (P)", actual: advisoryData.actual.P, target: advisoryData.targets.P, color: "var(--color-info)" },
+                  { name: "Potassium (K)", actual: advisoryData.actual.K, target: advisoryData.targets.K, color: "var(--color-accent)" },
+                ].map((nut) => {
+                  const pct = Math.min(100, Math.round((nut.actual / Math.max(1, nut.target)) * 100));
+                  return (
+                    <div key={nut.name} className="text-xs">
+                      <div className="flex justify-between mb-1">
+                        <span className="font-medium">{nut.name}</span>
+                        <span className="text-muted-foreground font-mono">{nut.actual.toFixed(0)} / {nut.target} kg/ha</span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden flex">
+                        <div className="h-full transition-all" style={{ width: `${pct}%`, backgroundColor: nut.color }} />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </div>
 
-              <div className="flex flex-col justify-between">
+            <div className="glass rounded-xl p-4 flex flex-col justify-between">
+              <div>
                 <span className="text-xs font-semibold text-muted-foreground block mb-3">Fertilizer Requirement Recommendation</span>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="p-2.5 rounded-xl bg-muted/40 border border-border">
@@ -247,13 +247,13 @@ function Soil() {
                     <span className="text-[9px] text-muted-foreground block mt-0.5">kg / hectare</span>
                   </div>
                 </div>
+              </div>
 
-                <div className="text-[11px] text-muted-foreground mt-3 flex items-start gap-1.5">
-                  <Beaker className="size-4 text-primary shrink-0 mt-0.5" />
-                  <span>
-                    Advises are calculated using Nitrogen (46%), Single Superphosphate (16%), and Muriate of Potash (60%) formulations adjusted for parcel-level soil health.
-                  </span>
-                </div>
+              <div className="text-[11px] text-muted-foreground mt-3 flex items-start gap-1.5">
+                <Beaker className="size-4 text-primary shrink-0 mt-0.5" />
+                <span>
+                  Advises are calculated using Nitrogen (46%), Single Superphosphate (16%), and Muriate of Potash (60%) formulations adjusted for parcel-level soil health.
+                </span>
               </div>
             </div>
           </div>
