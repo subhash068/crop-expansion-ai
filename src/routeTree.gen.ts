@@ -17,11 +17,11 @@ import { Route as SchemesRouteImport } from './routes/schemes'
 import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ParcelsRouteImport } from './routes/parcels'
 import { Route as GisRouteImport } from './routes/gis'
+import { Route as FarmerRouteImport } from './routes/farmer'
 import { Route as ExpansionRouteImport } from './routes/expansion'
 import { Route as DiversificationRouteImport } from './routes/diversification'
 import { Route as DistributionRouteImport } from './routes/distribution'
 import { Route as CropMappingRouteImport } from './routes/crop-mapping'
-import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as AdvisoryRouteImport } from './routes/advisory'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -65,6 +65,11 @@ const GisRoute = GisRouteImport.update({
   path: '/gis',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FarmerRoute = FarmerRouteImport.update({
+  id: '/farmer',
+  path: '/farmer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExpansionRoute = ExpansionRouteImport.update({
   id: '/expansion',
   path: '/expansion',
@@ -85,11 +90,6 @@ const CropMappingRoute = CropMappingRouteImport.update({
   path: '/crop-mapping',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CopilotRoute = CopilotRouteImport.update({
-  id: '/copilot',
-  path: '/copilot',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdvisoryRoute = AdvisoryRouteImport.update({
   id: '/advisory',
   path: '/advisory',
@@ -104,11 +104,11 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/advisory': typeof AdvisoryRoute
-  '/copilot': typeof CopilotRoute
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
   '/expansion': typeof ExpansionRoute
+  '/farmer': typeof FarmerRoute
   '/gis': typeof GisRoute
   '/parcels': typeof ParcelsRoute
   '/reports': typeof ReportsRoute
@@ -121,11 +121,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/advisory': typeof AdvisoryRoute
-  '/copilot': typeof CopilotRoute
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
   '/expansion': typeof ExpansionRoute
+  '/farmer': typeof FarmerRoute
   '/gis': typeof GisRoute
   '/parcels': typeof ParcelsRoute
   '/reports': typeof ReportsRoute
@@ -139,11 +139,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/advisory': typeof AdvisoryRoute
-  '/copilot': typeof CopilotRoute
   '/crop-mapping': typeof CropMappingRoute
   '/distribution': typeof DistributionRoute
   '/diversification': typeof DiversificationRoute
   '/expansion': typeof ExpansionRoute
+  '/farmer': typeof FarmerRoute
   '/gis': typeof GisRoute
   '/parcels': typeof ParcelsRoute
   '/reports': typeof ReportsRoute
@@ -158,11 +158,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/advisory'
-    | '/copilot'
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
     | '/expansion'
+    | '/farmer'
     | '/gis'
     | '/parcels'
     | '/reports'
@@ -175,11 +175,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/advisory'
-    | '/copilot'
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
     | '/expansion'
+    | '/farmer'
     | '/gis'
     | '/parcels'
     | '/reports'
@@ -192,11 +192,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/advisory'
-    | '/copilot'
     | '/crop-mapping'
     | '/distribution'
     | '/diversification'
     | '/expansion'
+    | '/farmer'
     | '/gis'
     | '/parcels'
     | '/reports'
@@ -210,11 +210,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdvisoryRoute: typeof AdvisoryRoute
-  CopilotRoute: typeof CopilotRoute
   CropMappingRoute: typeof CropMappingRoute
   DistributionRoute: typeof DistributionRoute
   DiversificationRoute: typeof DiversificationRoute
   ExpansionRoute: typeof ExpansionRoute
+  FarmerRoute: typeof FarmerRoute
   GisRoute: typeof GisRoute
   ParcelsRoute: typeof ParcelsRoute
   ReportsRoute: typeof ReportsRoute
@@ -283,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/farmer': {
+      id: '/farmer'
+      path: '/farmer'
+      fullPath: '/farmer'
+      preLoaderRoute: typeof FarmerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/expansion': {
       id: '/expansion'
       path: '/expansion'
@@ -311,13 +318,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CropMappingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/copilot': {
-      id: '/copilot'
-      path: '/copilot'
-      fullPath: '/copilot'
-      preLoaderRoute: typeof CopilotRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/advisory': {
       id: '/advisory'
       path: '/advisory'
@@ -338,11 +338,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdvisoryRoute: AdvisoryRoute,
-  CopilotRoute: CopilotRoute,
   CropMappingRoute: CropMappingRoute,
   DistributionRoute: DistributionRoute,
   DiversificationRoute: DiversificationRoute,
   ExpansionRoute: ExpansionRoute,
+  FarmerRoute: FarmerRoute,
   GisRoute: GisRoute,
   ParcelsRoute: ParcelsRoute,
   ReportsRoute: ReportsRoute,

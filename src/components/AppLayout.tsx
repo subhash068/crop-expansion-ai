@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard, Satellite, MapPin, BarChart3, Sprout, Map,
   CloudRain, Mountain, BadgeCheck, MessageSquare, Globe2,
-  Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search, Target, Menu
+  Bot, FileText, Settings, Leaf, Sun, Moon, Bell, Search, Target, Menu,
+  Smartphone
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
@@ -21,7 +22,7 @@ const nav = [
   { to: "/soil", label: "Soil Intelligence", icon: Mountain },
   { to: "/schemes", label: "Scheme Monitoring", icon: BadgeCheck },
   { to: "/advisory", label: "Advisory Center", icon: MessageSquare },
-  { to: "/copilot", label: "AI Copilot", icon: Bot },
+  { to: "/farmer", label: "Farmer App", icon: Smartphone },
   { to: "/reports", label: "Reports", icon: FileText },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;

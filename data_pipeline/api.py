@@ -7,7 +7,17 @@ from typing import Dict, Any
 
 from .suitability import calculate_suitability
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(title="Crop Expansion AI API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load model
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'crop_classifier.joblib')
@@ -77,6 +87,32 @@ def predict_suitability(request: SuitabilityRequest):
         "target_crop": request.target_crop,
         "suitability_score": score
     }
+
+try:
+    # pyrefly: ignore [missing-import]
+    import google.generativeai as genai
+except ImportError:
+    genai = None
+
+class ChatRequest(BaseModel):
+    message: str
+
+@app.post("/chat")
+def chat_endpoint(request: ChatRequest):
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key or genai is None:
+        return {"response": "Hello! I am ready to answer any question, but my AI backend is not fully set up. Please install `google-generativeai` and set the GEMINI_API_KEY environment variable on the server!"}
+    
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        system_prompt = "You are Farmer Copilot, a helpful AI assistant for Indian farmers using the CropVision app. Answer concisely and politely. Question: "
+        response = model.generate_content(system_prompt + request.message)
+        
+        return {"response": response.text}
+    except Exception as e:
+        return {"response": f"Sorry, I encountered an error: {str(e)}"}
 
 if __name__ == "__main__":
     import uvicorn

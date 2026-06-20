@@ -5,6 +5,8 @@ import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section, KpiCard, Badge } from "@/components/Kpi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroundTruth, useSatellite, useSoil, useWeather, useYield } from "@/lib/data";
+import { usePredictCrop } from "@/lib/api";
+import { Loader2, BrainCircuit } from "lucide-react";
 
 export const Route = createFileRoute("/parcels")({
   head: () => ({ meta: [{ title: "Parcel Intelligence — CropVision AI" }] }),
@@ -65,6 +67,8 @@ function Parcels() {
     const y = yields.find((x) => x.parcel_id === sel && x.season === "Kharif");
     return { base: kharif, sat: s, soil: so, weather: w, yield: y };
   }, [sel, gt, sat, soil, weather, yields]);
+
+  const { data: liveCrop, isLoading: isLoadingLiveCrop, error: liveCropError } = usePredictCrop(detail?.sat);
 
   return (
     <AppLayout>
@@ -144,8 +148,18 @@ function Parcels() {
             <>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <KpiCard label="Area" value={`${detail.base.land_area_acres} ac`} icon={MapPin} />
-                <KpiCard label="Current Crop" value={detail.base.crop_type} icon={Wheat} accent="info" />
-                <KpiCard label="NDVI" value={detail.sat?.NDVI?.toFixed(2) ?? "—"} icon={Activity} accent="accent" />
+                <KpiCard label="Ground Truth Crop" value={detail.base.crop_type} icon={Wheat} accent="info" />
+                <KpiCard 
+                  label="Live AI Prediction" 
+                  value={
+                    isLoadingLiveCrop ? <Loader2 className="size-4 animate-spin" /> :
+                    liveCropError ? "Error" :
+                    liveCrop?.predicted_crop ?? "—"
+                  } 
+                  icon={BrainCircuit} 
+                  accent={liveCrop?.predicted_crop === detail.base.crop_type ? "primary" : "warning"} 
+                  trend={liveCrop ? { value: `${liveCrop.confidence}% conf.`, positive: true } : undefined}
+                />
                 <KpiCard label="Yield" value={`${detail.yield?.yield_kg_per_acre?.toFixed(0) ?? "—"} kg/ac`} icon={TrendingUp} accent="warning" />
               </div>
 

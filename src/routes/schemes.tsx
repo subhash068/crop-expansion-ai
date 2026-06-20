@@ -6,7 +6,7 @@ import { BadgeCheck, Target, Users, TrendingUp, Sparkles, Send } from "lucide-re
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { chartTooltip } from "./index";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 export const Route = createFileRoute("/schemes")({
   head: () => ({ meta: [{ title: "Scheme Monitoring — CropVision AI" }] }),
@@ -14,9 +14,15 @@ export const Route = createFileRoute("/schemes")({
 });
 
 function Schemes() {
+  const [initiatedCampaigns, setInitiatedCampaigns] = useState<string[]>([]);
+  const [rskApps, setRskApps] = useState<any[]>([]);
   const gt = useGroundTruth().data ?? [];
   const suit = useSuitability().data ?? [];
   const kharif = gt.filter((g) => g.season === "Kharif");
+
+  useEffect(() => {
+    setRskApps(JSON.parse(localStorage.getItem('rsk_applications') || '[]'));
+  }, []);
 
   const mandalOpportunity = useMemo(() => {
     const parcelToMandal: Record<string, string> = {};
@@ -95,6 +101,43 @@ function Schemes() {
         </Section>
       </div>
 
+      {rskApps.length > 0 && (
+        <Section 
+          title={<span className="flex items-center gap-2"><BadgeCheck className="size-5 text-success" /> Recent RSK Subsidy Applications</span>} 
+          subtitle="Live applications submitted via the Farmer App"
+          className="mt-4 border-success/20"
+        >
+          <div className="overflow-auto rounded-lg border border-border">
+            <table className="w-full text-xs">
+              <thead className="bg-muted/40 text-muted-foreground uppercase text-[10px]">
+                <tr>
+                  <th className="text-left p-2.5">Date</th>
+                  <th className="text-left p-2.5">Parcel ID</th>
+                  <th className="text-left p-2.5">Farmer Name</th>
+                  <th className="text-left p-2.5">Village</th>
+                  <th className="text-left p-2.5">Target Crop</th>
+                  <th className="text-center p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rskApps.map((app, i) => (
+                  <tr key={i} className="border-t border-border hover:bg-muted/20">
+                    <td className="p-2.5">{app.date}</td>
+                    <td className="p-2.5 font-mono">{app.parcel_id}</td>
+                    <td className="p-2.5 font-semibold">{app.farmer_name}</td>
+                    <td className="p-2.5">{app.village}</td>
+                    <td className="p-2.5 text-accent font-medium">{app.crop}</td>
+                    <td className="p-2.5 text-center">
+                      <span className="bg-success/20 text-success px-2 py-1 rounded text-[10px] font-bold">Approved</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Section>
+      )}
+
       <Section 
         title={<span className="flex items-center gap-2"><Sparkles className="size-5 text-accent" /> AI Target List: Highest Opportunity Regions</span>} 
         subtitle="Mandals ranked by missed opportunity (High AI crop suitability but currently low scheme adoption)"
@@ -130,14 +173,23 @@ function Schemes() {
 
                     <td className="p-2.5">
                       {isPrime ? (
-                        <button 
-                          onClick={() => toast.success(`Outreach Campaign Initiated`, {
-                            description: `Targeting farmers in ${m.mandal} to drive adoption.`,
-                          })}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent/20 text-accent font-semibold hover:bg-accent hover:text-accent-foreground transition-colors w-max"
-                        >
-                          <Send className="size-3" /> Initiate Campaign
-                        </button>
+                        initiatedCampaigns.includes(m.mandal) ? (
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-success/20 text-success font-semibold w-max border border-success/30">
+                            <BadgeCheck className="size-3" /> Campaign Active
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => {
+                              setInitiatedCampaigns(prev => [...prev, m.mandal]);
+                              toast.success(`Outreach Campaign Initiated`, {
+                                description: `Targeting farmers in ${m.mandal} to drive adoption.`,
+                              });
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent/20 text-accent font-semibold hover:bg-accent hover:text-accent-foreground transition-colors w-max"
+                          >
+                            <Send className="size-3" /> Initiate Campaign
+                          </button>
+                        )
                       ) : (
                         <Badge variant={isSaturated ? "success" : "default"}>
                           {isSaturated ? "Saturated" : "Moderate Opportunity"}

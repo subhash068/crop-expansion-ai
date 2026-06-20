@@ -1,8 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section, Badge } from "@/components/Kpi";
-import { useSuitability, useGroundTruth, useWeather, cropCategory } from "@/lib/data";
-import { Languages, Sprout, Droplets, AlertTriangle } from "lucide-react";
+import { useSuitability, useGroundTruth, useWeather, useSoil, cropCategory } from "@/lib/data";
+import { Languages, Sprout, Droplets, AlertTriangle, ExternalLink } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/advisory")({
@@ -18,18 +18,18 @@ export const Route = createFileRoute("/advisory")({
 
 const ADVISORY_TEMPLATES = {
   en: {
-    millet_expand: (crop: string) => `Millet (${crop}) cultivation is recommended in this parcel. Suitable for rainfed conditions with good drought tolerance.`,
-    oilseed: (crop: string) => `Suitable for oilseed expansion — ${crop} is recommended given current soil and rainfall profile.`,
-    pulses: (crop: string) => `${crop} cultivation will improve soil nitrogen and provide better returns this season.`,
-    drought: () => "High drought risk detected. Switch to short-duration drought-tolerant varieties.",
-    rainfed: () => "Rainfed millet cultivation advised. Avoid water-intensive crops this season.",
+    millet_expand: (crop: string, name: string, ph: number, rain: number) => `Dear ${name}, with a soil pH of ${ph.toFixed(1)} and ${rain.toFixed(0)}mm seasonal rainfall, Millet (${crop}) cultivation is highly recommended to improve yields in rainfed conditions.`,
+    oilseed: (crop: string, name: string, zinc: number, temp: number) => `Dear ${name}, your parcel has optimal Zinc levels (${zinc.toFixed(1)} ppm) and average temps of ${temp.toFixed(1)}°C, making it highly suitable for ${crop} expansion.`,
+    pulses: (crop: string, name: string, nitrogen: number) => `Dear ${name}, your soil nitrogen is currently low (${nitrogen.toFixed(0)} kg/ha). Planting ${crop} will naturally fix nitrogen and provide better market returns.`,
+    drought: (name: string, rain: number) => `Dear ${name}, severe drought risk detected with only ${rain.toFixed(0)}mm expected rainfall. Switch to short-duration drought-tolerant varieties immediately to minimize loss.`,
+    rainfed: (name: string, temp: number, carbon: number) => `Dear ${name}, rainfed cultivation advised due to ${temp.toFixed(1)}°C avg temps. Your organic carbon is ${carbon.toFixed(1)}%. Avoid water-intensive crops.`,
   },
   te: {
-    millet_expand: (crop: string) => `ఈ పార్సెల్‌లో మిల్లెట్ (${crop}) సాగు సిఫార్సు చేయబడింది. వర్షాధార పరిస్థితులకు అనుకూలం.`,
-    oilseed: (crop: string) => `నూనెగింజల విస్తరణకు అనుకూలం — ${crop} సాగు సిఫార్సు చేయబడింది.`,
-    pulses: (crop: string) => `${crop} సాగు భూమి సారాన్ని మెరుగుపరుస్తుంది మరియు మంచి లాభాలు ఇస్తుంది.`,
-    drought: () => "అధిక కరువు ప్రమాదం. తక్కువ కాలం, కరువును తట్టుకునే రకాలకు మారండి.",
-    rainfed: () => "వర్షాధార మిల్లెట్ సాగు సలహా ఇవ్వబడుతుంది.",
+    millet_expand: (crop: string, name: string, ph: number, rain: number) => `ప్రియమైన ${name}, ${ph.toFixed(1)} మట్టి pH మరియు ${rain.toFixed(0)}mm వర్షపాతంతో, వర్షాధార పరిస్థితులలో దిగుబడిని పెంచడానికి మిల్లెట్ (${crop}) సాగు సిఫార్సు చేయబడింది.`,
+    oilseed: (crop: string, name: string, zinc: number, temp: number) => `ప్రియమైన ${name}, మీ భూమిలో జింక్ స్థాయిలు (${zinc.toFixed(1)} ppm) మరియు సగటు ఉష్ణోగ్రత ${temp.toFixed(1)}°C ఉండటం వలన, ఇది ${crop} సాగుకు అత్యంత అనుకూలం.`,
+    pulses: (crop: string, name: string, nitrogen: number) => `ప్రియమైన ${name}, మీ మట్టిలో నత్రజని తక్కువగా ఉంది (${nitrogen.toFixed(0)} kg/ha). ${crop} నాటడం ద్వారా నత్రజని సహజంగా పెరుగుతుంది మరియు మంచి లాభాలు వస్తాయి.`,
+    drought: (name: string, rain: number) => `ప్రియమైన ${name}, కేవలం ${rain.toFixed(0)}mm వర్షపాతం అంచనాతో తీవ్రమైన కరువు ప్రమాదం. నష్టాన్ని తగ్గించడానికి తక్కువ కాల వ్యవధి గల కరువును తట్టుకునే రకాలకు మారండి.`,
+    rainfed: (name: string, temp: number, carbon: number) => `ప్రియమైన ${name}, ${temp.toFixed(1)}°C సగటు ఉష్ణోగ్రత మరియు సేంద్రియ కర్బనం ${carbon.toFixed(1)}% ఉండటం వలన, వర్షాధార సాగు సలహా ఇవ్వబడుతుంది.`,
   },
 };
 
@@ -37,26 +37,50 @@ function Advisory() {
   const suit = useSuitability().data ?? [];
   const gt = useGroundTruth().data ?? [];
   const w = useWeather().data ?? [];
+  const s = useSoil().data ?? [];
   const [lang, setLang] = useState<"en" | "te">("en");
+  const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const [broadcasted, setBroadcasted] = useState(false);
 
   const advisories = useMemo(() => {
     const gMap = new Map(gt.filter((g) => g.season === "Kharif").map((g) => [g.parcel_id, g]));
     const wMap = new Map(w.filter((x) => x.season === "Kharif").map((x) => [x.parcel_id, x]));
-    return suit.filter((s) => s.season === "Kharif").map((s) => {
-      const g = gMap.get(s.parcel_id);
-      const we = wMap.get(s.parcel_id);
-      const cat = cropCategory(s.recommended_crop);
+    const sMap = new Map(s.filter((x) => x.season === "Kharif").map((x) => [x.parcel_id, x]));
+    
+    const seenFarmers = new Set<string>();
+    
+    return suit.filter((st) => st.season === "Kharif").map((st) => {
+      const g = gMap.get(st.parcel_id);
+      const we = wMap.get(st.parcel_id);
+      const so = sMap.get(st.parcel_id);
+      const cat = cropCategory(st.recommended_crop);
       const t = ADVISORY_TEMPLATES[lang];
+      
+      const fname = g?.farmer_name || "Farmer";
       let msg = "";
       let type: "millet" | "oilseed" | "pulse" | "drought" | "rainfed" = "millet";
-      if (we?.drought_risk === "High") { msg = t.drought(); type = "drought"; }
-      else if (cat === "Millets") { msg = t.millet_expand(s.recommended_crop); type = "millet"; }
-      else if (cat === "Oilseeds") { msg = t.oilseed(s.recommended_crop); type = "oilseed"; }
-      else if (cat === "Pulses") { msg = t.pulses(s.recommended_crop); type = "pulse"; }
-      else { msg = t.rainfed(); type = "rainfed"; }
-      return { parcel_id: s.parcel_id, village: g?.village, mandal: g?.mandal, msg, type, score: s.suitability_score };
+      
+      if (we?.drought_risk === "High") { msg = t.drought(fname, we?.total_rainfall_mm || 0); type = "drought"; }
+      else if (cat === "Millets") { msg = t.millet_expand(st.recommended_crop, fname, so?.pH || 7, we?.total_rainfall_mm || 0); type = "millet"; }
+      else if (cat === "Oilseeds") { msg = t.oilseed(st.recommended_crop, fname, so?.zinc_ppm || 0, we?.avg_temperature_c || 0); type = "oilseed"; }
+      else if (cat === "Pulses") { msg = t.pulses(st.recommended_crop, fname, so?.nitrogen_kg_ha || 0); type = "pulse"; }
+      else { msg = t.rainfed(fname, we?.avg_temperature_c || 0, so?.organic_carbon || 0); type = "rainfed"; }
+      
+      return { 
+        parcel_id: st.parcel_id, 
+        farmer_name: fname,
+        village: g?.village || "Unknown", 
+        mandal: g?.mandal || "Unknown", 
+        msg, 
+        type, 
+        score: st.suitability_score 
+      };
+    }).filter(a => {
+      if (seenFarmers.has(a.farmer_name) && a.farmer_name !== "Farmer") return false;
+      seenFarmers.add(a.farmer_name);
+      return true;
     }).sort((a, b) => b.score - a.score);
-  }, [suit, gt, w, lang]);
+  }, [suit, gt, w, s, lang]);
 
   return (
     <AppLayout>
@@ -88,8 +112,32 @@ function Advisory() {
             Advisories are automatically synced with local RSK channels and ready for dissemination via regional SMS campaigns and mobile notifications in Telugu.
           </div>
         </div>
-        <button className="h-8 px-4 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors self-start md:self-auto shrink-0 shadow-sm">
-          Trigger Broadcast Campaign
+        <button 
+          disabled={isBroadcasting || broadcasted}
+          onClick={() => {
+            setIsBroadcasting(true);
+            setTimeout(() => {
+              setIsBroadcasting(false);
+              setBroadcasted(true);
+              import('sonner').then(({ toast }) => {
+                toast.success("Broadcast Campaign Sent", {
+                  description: "Advisories have been dispatched to all eligible farmers via RSK SMS gateways.",
+                });
+              });
+            }, 1500);
+          }}
+          className="h-8 px-4 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/95 transition-colors self-start md:self-auto shrink-0 shadow-sm flex items-center justify-center gap-2 disabled:opacity-80"
+        >
+          {isBroadcasting ? (
+            <>
+              <div className="size-3 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+              Sending...
+            </>
+          ) : broadcasted ? (
+            "Campaign Sent"
+          ) : (
+            "Trigger Broadcast Campaign"
+          )}
         </button>
       </div>
 
@@ -99,16 +147,25 @@ function Advisory() {
           const Icon = icon;
           const v = a.type === "drought" ? "danger" : a.type === "oilseed" ? "warning" : "success";
           return (
-            <div key={a.parcel_id} className="glass rounded-xl p-4">
-              <div className="flex items-start justify-between mb-2">
+            <Link 
+              key={a.parcel_id} 
+              to="/farmer"
+              search={{ parcel: a.parcel_id }}
+              className="glass rounded-xl p-4 block hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer relative group"
+            >
+              <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                <ExternalLink className="size-4 text-primary" />
+              </div>
+              <div className="flex items-start justify-between mb-2 pr-6">
                 <Badge variant={v as any}><Icon className="size-3 mr-1 inline" />{a.type}</Badge>
                 <span className="text-[10px] text-muted-foreground font-mono">{a.parcel_id}</span>
               </div>
-              <div className="text-sm leading-relaxed mb-2">{a.msg}</div>
-              <div className="text-[11px] text-muted-foreground border-t border-border/50 pt-2">
-                {a.village} · {a.mandal} · Score {a.score.toFixed(0)}
+              <div className="text-sm leading-relaxed mb-3">{a.msg}</div>
+              <div className="text-[11px] text-muted-foreground border-t border-border/50 pt-3 flex justify-between items-center">
+                <span>{a.village} · {a.mandal}</span>
+                <span className="font-semibold text-primary/80">Suitability: {a.score.toFixed(0)}/100</span>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
