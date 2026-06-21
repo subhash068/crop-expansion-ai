@@ -183,3 +183,11 @@
   scrollbar-width: thin;
   scrollbar-color: var(--color-muted) var(--color-background);
 }
+
+/* Recharts Tooltip Text Color Fix */
+.recharts-default-tooltip {
+  color: #fff !important;
+}
+.recharts-tooltip-item {
+  color: #fff !important;
+}
