@@ -314,8 +314,8 @@ function MapView({ parcels, layer, gMap, suitMap, onParcelClick }: any) {
       await import("leaflet/dist/leaflet.css");
       if (cancelled || !ref.current) return;
       map = L.map(ref.current, { center: [14.5, 77.7], zoom: 9, scrollWheelZoom: true });
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "© OpenStreetMap", maxZoom: 18,
+      L.tileLayer("https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", {
+        attribution: "© Google Maps", maxZoom: 20,
       }).addTo(map);
       (map as any)._cropviz = { L };
       (ref.current as any)._map = map;
