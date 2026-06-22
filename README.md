@@ -7,7 +7,7 @@ CropVision AI is a high-performance, interactive Business Intelligence dashboard
 By synthesizing geospatial data, ground truth data (e-Panta), soil health records (APSAC), and weather information (APSDPS), the application empowers agricultural stakeholders with actionable insights to drive crop diversification and improve land fertility.
 
 ## 🚀 Live Demo
-**[View the Live Dashboard](https://subhash068-andhra-agri-ai.innovative383.workers.dev)**
+**[View the Live Dashboard](https://subhash068-andhra-agri-ai.innovative383.workers.dev/)**
 
 ## ✨ Key Features
 
