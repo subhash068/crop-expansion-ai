@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { SatelliteRow, SoilRow, WeatherRow } from "./data";
 
-const API_BASE = "http://localhost:8001";
+const API_BASE = "https://dull-fans-end.loca.lt";
 
 export const usePredictCrop = (satData?: SatelliteRow) => {
   return useQuery({

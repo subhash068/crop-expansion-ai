@@ -2,3 +2,10 @@
 
 npx nitro deploy --prebuilt
 npm run build; npx nitro deploy --prebuilt
+
+
+
+npx -y localtunnel --port 8000
+https://some-bats-search.loca.lt/
+
+https://subhash068-andhra-agri-ai.innovative383.workers.dev/
