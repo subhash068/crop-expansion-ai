@@ -5,7 +5,7 @@ import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { KpiCard, Section } from "@/components/Kpi";
 import { useSoil, useParcels, groupBy } from "@/lib/data";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { chartTooltip } from "./index";
+import { chartTooltip, renderCustomPieLabel } from "./index";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/soil")({
@@ -190,12 +190,12 @@ function Soil() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
         <Section title="Soil Type Distribution">
           <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={typePie} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90}>
+            <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <Pie data={typePie} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} label={renderCustomPieLabel}>
                 {typePie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Section>

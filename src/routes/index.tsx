@@ -83,12 +83,12 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
         <Section title="Crop Distribution" subtitle="Kharif 2025 · acres" className="lg:col-span-1">
           <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={cropPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={95} paddingAngle={2}>
+            <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <Pie data={cropPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={95} paddingAngle={2} label={renderCustomPieLabel}>
                 {cropPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Section>
@@ -185,3 +185,13 @@ export const chartTooltip = {
   fontSize: 12,
   color: "#fff",
 };
+
+export const renderCustomPieLabel = ({ percent, name, fill, x, y, textAnchor }: any) => {
+  if (percent < 0.02) return null;
+  return (
+    <text x={x} y={y} fill={fill} textAnchor={textAnchor} dominantBaseline="central" fontSize={11} fontWeight={500}>
+      {name} {(percent * 100).toFixed(0)}%
+    </text>
+  );
+};
+

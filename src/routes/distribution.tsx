@@ -4,7 +4,7 @@ import { AppLayout, PageHeader } from "@/components/AppLayout";
 import { Section } from "@/components/Kpi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGroundTruth, cropCategory, groupBy, sum, uniq } from "@/lib/data";
-import { chartTooltip } from "./index";
+import { chartTooltip, renderCustomPieLabel } from "./index";
 import { useMemo, useState } from "react";
 
 export const Route = createFileRoute("/distribution")({
@@ -76,12 +76,12 @@ function Distribution() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Section title="Crop Mix" subtitle={`${season} ${mandal !== "All" ? "· " + mandal : ""}`}>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={cropPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={100} paddingAngle={2}>
+            <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <Pie data={cropPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={100} paddingAngle={2} label={renderCustomPieLabel}>
                 {cropPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
+              <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Section>
