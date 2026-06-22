@@ -83,12 +83,12 @@ function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
         <Section title="Crop Distribution" subtitle="Kharif 2025 · acres" className="lg:col-span-1">
           <ResponsiveContainer width="100%" height={280}>
-            <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-              <Pie data={cropPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={55} outerRadius={95} paddingAngle={2} label={renderCustomPieLabel}>
+            <PieChart margin={{ top: 20, right: 20, bottom: 30, left: 20 }}>
+              <Pie data={cropPie} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} label={renderCustomPieLabel}>
                 {cropPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
-              <Legend wrapperStyle={{ fontSize: 11 }} iconType="circle" />
+              <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Section>

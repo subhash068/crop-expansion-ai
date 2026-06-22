@@ -76,12 +76,12 @@ function Distribution() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <Section title="Crop Mix" subtitle={`${season} ${mandal !== "All" ? "· " + mandal : ""}`}>
           <ResponsiveContainer width="100%" height={300}>
-            <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-              <Pie data={cropPie} dataKey="value" nameKey="name" innerRadius={55} outerRadius={100} paddingAngle={2} label={renderCustomPieLabel}>
+            <PieChart margin={{ top: 20, right: 20, bottom: 30, left: 20 }}>
+              <Pie data={cropPie} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2} label={renderCustomPieLabel}>
                 {cropPie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
-              <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" />
+              <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Section>

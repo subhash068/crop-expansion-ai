@@ -190,12 +190,12 @@ function Soil() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
         <Section title="Soil Type Distribution">
           <ResponsiveContainer width="100%" height={260}>
-            <PieChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-              <Pie data={typePie} dataKey="value" nameKey="name" innerRadius={50} outerRadius={90} label={renderCustomPieLabel}>
+            <PieChart margin={{ top: 20, right: 20, bottom: 30, left: 20 }}>
+              <Pie data={typePie} dataKey="value" nameKey="name" innerRadius={45} outerRadius={75} label={renderCustomPieLabel}>
                 {typePie.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={chartTooltip} itemStyle={{ color: "#fff" }} />
-              <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" />
+              <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Section>
